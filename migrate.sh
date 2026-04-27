@@ -1,13 +1,13 @@
 #!/bin/bash
-# 百妖谱图片迁移脚本
+# 围城之夜图片迁移脚本
 # 从 bloodstar.clocktica.com 下载所有图片到本地，并生成新的 JSON
 
 set -e
 
 REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
 IMG_DIR="$REPO_DIR/images"
-JSON_IN="$REPO_DIR/yaoguai.json"
-JSON_OUT="$REPO_DIR/yaoguai.json"
+JSON_IN="$REPO_DIR/weicheng.json"
+JSON_OUT="$REPO_DIR/weicheng.json"
 
 # GitHub raw URL base (上传后图片的访问地址)
 GITHUB_RAW_BASE="https://raw.githubusercontent.com/olveryu/block-on-the-clock-tower-script/main/images"
@@ -15,7 +15,7 @@ GITHUB_RAW_BASE="https://raw.githubusercontent.com/olveryu/block-on-the-clock-to
 # 旧 URL base
 OLD_BASE="https://bloodstar.clocktica.com/p/olveryu/yaoguai"
 
-echo "=== 百妖谱图片迁移工具 ==="
+echo "=== 围城之夜图片迁移工具 ==="
 echo ""
 
 # 1. 创建 images 目录
@@ -95,7 +95,7 @@ echo ""
 echo "下一步:"
 echo "  cd $REPO_DIR"
 echo "  git add ."
-echo "  git commit -m 'feat: 迁移百妖谱图片至 GitHub'"
+echo "  git commit -m 'feat: 迁移围城之夜图片至 GitHub'"
 echo "  git push origin main"
 echo ""
 echo "推送后，你的新 JSON 文件可以直接导入 clocktower.online 使用。"
