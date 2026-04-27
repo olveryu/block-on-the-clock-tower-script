@@ -2,7 +2,7 @@
 
 **Blood on the Clocktower Custom Script** · By Edwin Yan · 12–15 players recommended
 
-Import URL: `https://raw.githubusercontent.com/olveryu/block-on-the-clock-tower-script/main/siege.json`
+Import URL: `https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/siege.json`
 
 ---
 

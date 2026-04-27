@@ -2,7 +2,7 @@
 
 **染·钟楼谜团 自定义剧本** · 作者：Edwin Yan · 推荐 12–15 人
 
-导入链接：`https://raw.githubusercontent.com/olveryu/block-on-the-clock-tower-script/main/weicheng.json`
+导入链接：`https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/weicheng.json`
 
 ---
 

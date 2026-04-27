@@ -10,7 +10,7 @@ JSON_IN="$REPO_DIR/weicheng.json"
 JSON_OUT="$REPO_DIR/weicheng.json"
 
 # GitHub raw URL base (上传后图片的访问地址)
-GITHUB_RAW_BASE="https://raw.githubusercontent.com/olveryu/block-on-the-clock-tower-script/main/images"
+GITHUB_RAW_BASE="https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images"
 
 # 旧 URL base
 OLD_BASE="https://bloodstar.clocktica.com/p/olveryu/yaoguai"
