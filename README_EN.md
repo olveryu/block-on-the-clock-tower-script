@@ -43,7 +43,7 @@ Inquisitor (detect evil), Herald/Patrolman (detect Outsiders), Coroner (autopsy)
 | Shieldbearer | While you are alive, Outsiders do not trigger their death effects when dying at night. |
 | Baroness | While you are alive, executed players do not trigger Outsider death effects. |
 | Scribe | On your first night, you learn the sum of all Outsider players' seat numbers. |
-| Herald | Each night, choose 2 players: you learn if either is an Outsider. |
+| Herald | Each day, you may privately visit the Storyteller and name 3 players: you learn if exactly one of them is an Outsider. |
 | Ranger | If you die at night, choose an alive player: if they are a non-Demon evil player, they lose their ability and die. |
 | Inquisitor | Each night, choose 3 other alive players: you learn if any is a non-Demon evil player. |
 | Patrolman | Each night, choose a player: you learn if either alive neighbour of that player is an Outsider. |
