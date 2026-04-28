@@ -56,14 +56,14 @@
   {
     "id": "4_weicheng",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/4_weicheng.png",
-    "firstNightReminder": "每个夜晚，你要选择三名存活的其他玩家：你会得知是否有恶魔外的邪恶玩家。",
-    "otherNightReminder": "每个夜晚，你要选择三名存活的其他玩家：你会得知是否有恶魔外的邪恶玩家。",
+    "firstNightReminder": "每个夜晚，你要选择三名存活的其他玩家：你会得知他们之中是否恰好有一名非恶魔的邪恶玩家。",
+    "otherNightReminder": "每个夜晚，你要选择三名存活的其他玩家：你会得知他们之中是否恰好有一名非恶魔的邪恶玩家。",
     "reminders": [
       "审讯"
     ],
     "name": "审讯官",
     "team": "townsfolk",
-    "ability": "每个夜晚，你要选择三名存活的其他玩家：你会得知是否有恶魔外的邪恶玩家。",
+    "ability": "每个夜晚，你要选择三名存活的其他玩家：你会得知他们之中是否恰好有一名非恶魔的邪恶玩家。",
     "firstNight": 42,
     "otherNight": 16
   },

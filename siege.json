@@ -56,14 +56,14 @@
   {
     "id": "4_siege",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/4_weicheng.png",
-    "firstNightReminder": "Each night, choose 3 other alive players: you learn if any is a non-Demon evil player.",
-    "otherNightReminder": "Each night, choose 3 other alive players: you learn if any is a non-Demon evil player.",
+    "firstNightReminder": "Each night, choose 3 other alive players: you learn if exactly one of them is a non-Demon evil player.",
+    "otherNightReminder": "Each night, choose 3 other alive players: you learn if exactly one of them is a non-Demon evil player.",
     "reminders": [
       "Interrogate"
     ],
     "name": "Inquisitor",
     "team": "townsfolk",
-    "ability": "Each night, choose 3 other alive players: you learn if any is a non-Demon evil player.",
+    "ability": "Each night, choose 3 other alive players: you learn if exactly one of them is a non-Demon evil player.",
     "firstNight": 42,
     "otherNight": 16
   },

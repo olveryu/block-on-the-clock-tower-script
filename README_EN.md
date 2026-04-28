@@ -45,7 +45,7 @@ Inquisitor (detect evil), Herald/Patrolman (detect Outsiders), Coroner (autopsy)
 | Scribe | On your first night, you learn the sum of all Outsider & all Minion players' seats. |
 | Herald | Each day, you may privately visit the Storyteller and name 3 players: you learn if exactly one of them is an Outsider. |
 | Ranger | If you die at night, choose an alive player: if they are a non-Demon evil player, they lose their ability and die. |
-| Inquisitor | Each night, choose 3 other alive players: you learn if any is a non-Demon evil player. |
+| Inquisitor | Each night, choose 3 other alive players: you learn if exactly one of them is a non-Demon evil player. |
 | Patrolman | Each night, choose a player: you learn if either alive neighbor of that player is an Outsider. |
 | Scout | On your first night, you learn 2 Demon characters; one is in play. From day 3, during the day, you may privately ask the Storyteller: learn the Demon character. |
 
