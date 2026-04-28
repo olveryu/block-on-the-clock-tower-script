@@ -1,14 +1,22 @@
 #!/usr/bin/env python3
 """
-围城之夜 12 人模拟器
+围城之夜 12 人模拟器 v2 (完整机关版)
 =======================
-用 Python 真随机骰子决定关键节点, 避免模拟者上帝视角偏差.
+真随机骰子 + 全部邪恶机关:
+- 外来者死亡链 (难民/伤兵/逃兵/俘虏)
+- 保险栓阻止 (女伯爵阻处决/盾卫阻夜杀)
+- 死士复活栈 (恶魔死时变恶魔)
+- 蛊惑者邻座傀儡 (每晚)
+- 内应 N1 双傀儡
+- 暗箭手 N1 + 交换能力
+- 叛将变身 (N2+)
+- 千面人多恶魔
+- 难民触发后死人变邪恶+死票
 
 用法:
     python3 botc_simulator.py        # 跑一局完整推演
-    python3 botc_simulator.py 30     # 跑 30 局看胜率
-
-最新更新: 2026-04-28 (v17 后)
+    python3 botc_simulator.py 30     # 跑 N 局看胜率
+    python3 botc_simulator.py 100 -v # 跑 100 局, 详细输出
 """
 
 import random
@@ -27,351 +35,624 @@ PLAYERS = ['阿信', '小白', '二哥', '月儿', '老王', '阿龙',
            '莉莉', '小七', '大刘', '苗苗', '阿强', '雪儿']
 
 
-def generate_config():
-    """生成 12 人随机配置"""
-    demon = random.choice(DEMON_POOL)
-    minions_raw = random.sample(MINION_POOL, 2)
+def is_demon_role(role):
+    return role in DEMON_POOL or '千面人' in role
 
-    if demon == '千面人':
-        outsider_count = 1
-        townsfolk_count = 8
-        minions = ['千面人', '千面人']
-    elif demon == '先锋官' or '叛将' in minions_raw:
-        outsider_count = 3
-        townsfolk_count = 6
-        minions = minions_raw
-    else:
-        outsider_count = 2
-        townsfolk_count = 7
-        minions = minions_raw
 
-    townsfolk = random.sample(TOWNSFOLK_POOL, townsfolk_count)
-    outsiders = random.sample(OUTSIDER_POOL, outsider_count)
-    not_in_play_t = [t for t in TOWNSFOLK_POOL if t not in townsfolk]
-    bluffs = random.sample(not_in_play_t, 3)
-    not_in_play_o = [o for o in OUTSIDER_POOL if o not in outsiders]
+def is_minion_role(role):
+    return role in MINION_POOL
 
-    roles = [demon] + minions + outsiders + townsfolk
-    random.shuffle(roles)
 
-    config = {}
-    for i, (p, r) in enumerate(zip(PLAYERS, roles), 1):
-        is_demon = r == demon or '千面人' in r
-        is_minion = r in MINION_POOL
-        if is_demon or is_minion:
-            team = "邪恶"
-        elif r in outsiders:
-            team = "外来者"
+def is_outsider_role(role):
+    return role in OUTSIDER_POOL
+
+
+class Game:
+    def __init__(self, verbose=True):
+        self.verbose = verbose
+        self.config = {}
+        self.deaths = []  # [(time, seat, role)]
+        self.day = 0
+        self.day_log = []
+
+        # 邪恶状态
+        self.demon_role = None
+        self.minions = []
+        self.outsiders = []
+        self.bluffs = []
+        self.evil_seats = []
+        self.demon_seats = []  # 千面人时多个
+
+        # 状态追踪
+        self.has_save_baron = False  # 女伯爵在场 alive
+        self.has_save_shield = False  # 盾卫在场 alive
+        self.dead_man_seat = None  # 死士位置
+        self.dead_man_active = False  # 死士复活栈是否还在
+        self.refugee_used = False  # 难民能力一次性
+
+        # 暗箭手追踪
+        self.archer_n1_target = None
+        self.archer_swapped = False
+
+        # 蛊惑/傀儡状态
+        self.puppet_status = {}  # {seat: True if puppet}
+        self.hex_target = None  # 当晚被蛊惑的人
+
+        # 难民变邪恶死人
+        self.evil_dead_votes = set()
+
+        self._generate_config()
+
+    def log(self, msg, indent=0):
+        if self.verbose:
+            print('  ' * indent + msg)
+
+    def _generate_config(self):
+        """生成 12 人随机配置"""
+        demon = random.choice(DEMON_POOL)
+        minions_raw = random.sample(MINION_POOL, 2)
+
+        if demon == '千面人':
+            outsider_count = 1
+            townsfolk_count = 8
+            minions_assignment = ['千面人', '千面人']
+        elif demon == '先锋官' or '叛将' in minions_raw:
+            outsider_count = 3
+            townsfolk_count = 6
+            minions_assignment = minions_raw
         else:
-            team = "镇民"
-        config[i] = {
-            'player': p, 'role': r, 'team': team,
-            'alive': True, 'puppet': False, 'original_role': r
-        }
+            outsider_count = 2
+            townsfolk_count = 7
+            minions_assignment = minions_raw
 
-    setup_info = {
-        'demon': demon, 'minions': minions, 'outsiders': outsiders,
-        'townsfolk': townsfolk, 'bluffs': bluffs,
-        'not_in_play_outsiders': not_in_play_o,
-    }
+        townsfolk = random.sample(TOWNSFOLK_POOL, townsfolk_count)
+        outsiders = random.sample(OUTSIDER_POOL, outsider_count)
+        not_in_play_t = [t for t in TOWNSFOLK_POOL if t not in townsfolk]
+        bluffs = random.sample(not_in_play_t, 3)
 
-    return config, setup_info
+        self.demon_role = demon
+        self.minions = minions_assignment
+        self.outsiders = outsiders
+        self.townsfolk = townsfolk
+        self.bluffs = bluffs
+        self.not_in_play_outsiders = [o for o in OUTSIDER_POOL if o not in outsiders]
 
+        roles = [demon] + minions_assignment + outsiders + townsfolk
+        random.shuffle(roles)
 
-def evil_setup_decisions(config, setup_info):
-    """邪恶 N0 决策: 死士自以为, 蛊惑者目标, 内应/暗箭手目标, bluff 选择"""
-    decisions = {}
-
-    if '死士' in setup_info['minions']:
-        seat = next(i for i in config if config[i]['role'] == '死士')
-        decisions['死士'] = {
-            'seat': seat,
-            'fake_role': random.choice(OUTSIDER_POOL),
-        }
-
-    if '蛊惑者' in setup_info['minions']:
-        seat = next(i for i in config if config[i]['role'] == '蛊惑者')
-        left = (seat - 2) % 12 + 1
-        right = seat % 12 + 1
-        if left == 0: left = 12
-        decisions['蛊惑者'] = {
-            'seat': seat,
-            'target': random.choice([left, right]),
-        }
-
-    if '内应' in setup_info['minions']:
-        seat = next(i for i in config if config[i]['role'] == '内应')
-        others = [i for i in config if i != seat]
-        decisions['内应'] = {
-            'seat': seat,
-            'target': random.choice(others),
-        }
-
-    if setup_info['demon'] == '暗箭手':
-        seat = next(i for i in config if config[i]['role'] == '暗箭手')
-        others = [i for i in config if i != seat]
-        decisions['暗箭手'] = {
-            'seat': seat,
-            'target': random.choice(others),
-        }
-
-    # 邪恶 bluff
-    bluffs = setup_info['bluffs']
-    not_in_play_o = setup_info['not_in_play_outsiders']
-
-    # 恶魔 bluff
-    decisions['demon_bluff'] = random.choice(bluffs)
-
-    # 爪牙 bluff
-    decisions['minion_bluffs'] = {}
-    for seat in config:
-        role = config[seat]['role']
-        if role in MINION_POOL and role != '死士':
-            # 35% 装外来者捣乱, 65% 装镇民 bluff
-            if random.random() < 0.35 and not_in_play_o:
-                choice = random.choice(not_in_play_o)
-                decisions['minion_bluffs'][seat] = ('外来者', choice)
+        for i, (p, r) in enumerate(zip(PLAYERS, roles), 1):
+            is_demon = (r == demon and demon != '千面人') or '千面人' in r
+            is_minion = r in MINION_POOL and r != '千面人'
+            if is_demon:
+                team = "邪恶"
+                self.demon_seats.append(i)
+            elif is_minion:
+                team = "邪恶"
+            elif r in outsiders:
+                team = "外来者"
             else:
-                avail = [b for b in bluffs if b != decisions['demon_bluff']]
-                choice = random.choice(avail) if avail else random.choice(bluffs)
-                decisions['minion_bluffs'][seat] = ('镇民', choice)
+                team = "镇民"
 
-    return decisions
+            self.config[i] = {
+                'player': p,
+                'role': r,
+                'original_role': r,
+                'team': team,
+                'alive': True,
+                'puppet': False,
+                'register_outsider': r in outsiders or r == '死士' or '千面人' in r,
+                'register_minion': is_minion or r == '死士' or '千面人' in r,
+                'self_busted': False,
+            }
+            if team == "邪恶":
+                self.evil_seats.append(i)
+            if r == '死士':
+                self.dead_man_seat = i
+                self.dead_man_active = True
+                self.config[i]['register_outsider'] = True
+            if r == '女伯爵':
+                self.has_save_baron = True
+            if r == '盾卫':
+                self.has_save_shield = True
 
+    def print_config(self):
+        if not self.verbose:
+            return
+        self.log(f"=== 配置 ===")
+        self.log(f"恶魔: {self.demon_role}, 爪牙: {self.minions}")
+        self.log(f"外来者: {self.outsiders}")
+        self.log(f"镇民: {self.townsfolk}")
+        self.log(f"Bluffs: {self.bluffs}")
+        for i in sorted(self.config):
+            c = self.config[i]
+            self.log(f"  {i}. {c['player']}: {c['role']} ({c['team']})")
+        self.log("")
 
-def real_outsider_self_bust(config, setup_info):
-    """真外来者自爆决策 (高玩谨慎)"""
-    decisions = {}
-    has_dead_man = '死士' in setup_info['minions']
-    for seat in config:
-        if config[seat]['team'] == '外来者':
-            prob = 0.40 if has_dead_man else 0.55
-            decisions[seat] = random.random() < prob
-    return decisions
+    def alive_seats(self, exclude=None):
+        excl = set(exclude or [])
+        return [i for i in self.config if self.config[i]['alive'] and i not in excl]
 
+    def alive_demons(self):
+        return [i for i in self.config if self.config[i]['alive'] and is_demon_role(self.config[i]['role'])]
 
-def n1_actions(config, setup_info):
-    """N1 善良信息源选择 (真随机)"""
-    actions = {}
+    def kill(self, seat, method='夜杀', by_demon=True):
+        """杀玩家, 返回是否触发死亡链"""
+        if not self.config[seat]['alive']:
+            return False
+        self.config[seat]['alive'] = False
+        time = f"D{self.day}" if method == '处决' else f"N{self.day}"
+        self.deaths.append((time, seat, self.config[seat]['role']))
+        self.log(f"  → {time} 死亡: {seat} ({self.config[seat]['player']}, {self.config[seat]['role']})", 1)
 
-    if '审讯官' in setup_info['townsfolk']:
-        seat = next(i for i in config if config[i]['role'] == '审讯官')
-        others = [i for i in config if i != seat and config[i]['alive']]
-        targets = sorted(random.sample(others, 3))
-        # 检查命中
-        non_demon_evil = [t for t in targets if config[t]['team'] == '邪恶'
-                           and config[t]['role'] not in DEMON_POOL
-                           and '千面人' not in config[t]['role']]
-        is_千面人_in = any('千面人' in config[t]['role'] for t in targets)
-        actions['审讯官'] = {
-            'seat': seat, 'targets': targets,
-            'yes': bool(non_demon_evil) or is_千面人_in,
-        }
+        # 更新保险栓状态
+        if self.config[seat]['role'] == '女伯爵':
+            self.has_save_baron = False
+        if self.config[seat]['role'] == '盾卫':
+            self.has_save_shield = False
 
-    if '巡逻兵' in setup_info['townsfolk']:
-        seat = next(i for i in config if config[i]['role'] == '巡逻兵')
-        others = [i for i in config if i != seat and config[i]['alive']]
-        target = random.choice(others)
-        left = (target - 2) % 12 + 1
-        right = target % 12 + 1
-        if left == 0: left = 12
-        # round-robin 跳死人
-        while not config[left]['alive']:
-            left = (left - 2) % 12 + 1
-            if left == 0: left = 12
-        while not config[right]['alive']:
-            right = right % 12 + 1
-        is_outsider = (config[left]['team'] == '外来者' or '死士' in config[left]['role'] or
-                       config[right]['team'] == '外来者' or '死士' in config[right]['role'])
-        actions['巡逻兵'] = {
-            'seat': seat, 'target': target, 'yes': is_outsider,
-        }
+        # 死士复活栈检查 - 如果恶魔死, 死士变恶魔
+        if is_demon_role(self.config[seat]['role']) and self.dead_man_active:
+            if self.dead_man_seat is not None and self.config[self.dead_man_seat]['alive']:
+                # 死士变恶魔
+                old_role = self.config[self.dead_man_seat]['role']
+                new_demon = self.config[seat]['original_role'] if 'original_role' in self.config[seat] else self.config[seat]['role']
+                self.config[self.dead_man_seat]['role'] = new_demon
+                self.config[self.dead_man_seat]['team'] = '邪恶'
+                self.demon_seats.append(self.dead_man_seat)
+                self.dead_man_active = False
+                self.log(f"  ★ 死士复活: {self.dead_man_seat} 从 {old_role} 变 {new_demon}", 1)
 
-    if '书记官' in setup_info['townsfolk']:
-        seat = next(i for i in config if config[i]['role'] == '书记官')
-        # 外来者+爪牙之和 (按 actual team, 不算 register 多重)
-        evil_outsider_seats = [i for i in config
-                                 if config[i]['team'] == '外来者' or
-                                    config[i]['role'] in MINION_POOL or
-                                    '千面人' in config[i]['role']]
-        # 但去重
-        total = sum(evil_outsider_seats)
-        actions['书记官'] = {'seat': seat, 'sum': total}
+        # 触发外来者/傀儡/死士死亡链
+        if self._should_trigger_death(seat, method):
+            self._trigger_death_chain(seat)
 
-    if '斥候' in setup_info['townsfolk']:
-        seat = next(i for i in config if config[i]['role'] == '斥候')
-        # 在场恶魔 + 1 干扰
-        in_play = setup_info['demon']
-        not_in = [d for d in DEMON_POOL if d != in_play]
-        actions['斥候'] = {
-            'seat': seat,
-            'candidates': sorted([in_play, random.choice(not_in)]),
-        }
+        return True
 
-    if '瞭望兵' in setup_info['townsfolk']:
-        seat = next(i for i in config if config[i]['role'] == '瞭望兵')
-        # 不在场池: 爪牙+外来者
-        not_in = ([m for m in MINION_POOL if m not in setup_info['minions']] +
-                  setup_info['not_in_play_outsiders'])
-        actions['瞭望兵'] = {
-            'seat': seat,
-            'told': random.choice(not_in) if not_in else None,
-        }
+    def _should_trigger_death(self, seat, method):
+        """检查死亡链是否触发"""
+        c = self.config[seat]
+        # 检查保护
+        if method == '处决' and self.has_save_baron:
+            return False
+        if method == '夜杀' and self.has_save_shield:
+            return False
 
-    return actions
+        # 是否是触发型角色
+        if c['role'] in OUTSIDER_POOL or c['role'] == '傀儡' or '千面人' in c['role'] or c['role'] == '死士':
+            return True
+        return False
 
+    def _trigger_death_chain(self, seat):
+        """触发外来者/傀儡/死士死亡能力"""
+        role = self.config[seat]['role']
+        # 死士死亡触发傀儡死亡能力
+        if role == '死士' or role == '傀儡' or '千面人' in role:
+            self._trigger_puppet_death()
+        elif role == '难民':
+            self._trigger_refugee()
+        elif role == '伤兵':
+            self._trigger_wounded()
+        elif role == '逃兵':
+            self._trigger_deserter()
+        elif role == '俘虏':
+            self._trigger_captive()
 
-def night_kill_choice(config, demon_role, n=2):
-    """夜晚击杀目标 (按威胁优先级骰子)"""
-    alive_others = [i for i in config if config[i]['alive']]
-    # 排除恶魔自己
-    demon_seat = next(i for i in config if config[i]['role'] == demon_role
-                       or (demon_role == '千面人' and config[i]['role'] == '千面人'))
-    alive_others = [i for i in alive_others if i != demon_seat]
+    def _trigger_puppet_death(self):
+        """傀儡死亡 → 选外来者角色发动死亡能力"""
+        # 恶魔选外来者 (按优先级)
+        choices = ['难民', '伤兵', '逃兵', '俘虏']
+        # 限制只能选场上有效的能力
+        valid = []
+        for c in choices:
+            if c == '难民' and not self.refugee_used and any(self.config[s]['team'] == '镇民' and not self.config[s]['alive'] and s not in self.evil_dead_votes for s in self.config):
+                valid.append((c, 0.4))
+            elif c == '伤兵' and self.alive_seats():
+                valid.append((c, 0.3))
+            elif c == '逃兵' and self.alive_seats():
+                valid.append((c, 0.4))
+            elif c == '俘虏' and any(self.config[s]['team'] == '邪恶' and self.config[s]['alive'] for s in self.config):
+                valid.append((c, 0.2))
 
-    threats = []
-    for i in alive_others:
-        role = config[i].get('original_role', config[i]['role'])
-        if role == '斥候' and not config[i].get('puppet'):
-            threats.append((i, 0.30))
-        elif role == '军医' and not config[i].get('puppet'):
-            threats.append((i, 0.20))
-        elif role == '女伯爵' and not config[i].get('puppet'):
-            threats.append((i, 0.20))
-        elif role == '盾卫' and not config[i].get('puppet'):
-            threats.append((i, 0.15))
-        elif role == '审讯官' and not config[i].get('puppet'):
-            threats.append((i, 0.10))
-        elif role == '瞭望兵':
-            threats.append((i, 0.08))
-        elif role == '纹章官':
-            threats.append((i, 0.07))
-        elif role == '密探':
-            threats.append((i, 0.07))
+        if not valid:
+            return
+        choices_v, weights = zip(*valid)
+        chosen = random.choices(choices_v, weights=weights)[0]
+        self.log(f"  傀儡死亡 → 恶魔选: {chosen}", 1)
+        if chosen == '难民':
+            self._trigger_refugee()
+        elif chosen == '伤兵':
+            self._trigger_wounded()
+        elif chosen == '逃兵':
+            self._trigger_deserter()
+        elif chosen == '俘虏':
+            self._trigger_captive()
+
+    def _trigger_refugee(self):
+        """难民死亡 → 选善良死人变邪恶"""
+        if self.refugee_used:
+            return
+        good_dead = [s for s in self.config if not self.config[s]['alive']
+                      and self.config[s]['team'] != '邪恶'
+                      and s not in self.evil_dead_votes]
+        if not good_dead:
+            return
+        chosen = random.choice(good_dead)
+        self.evil_dead_votes.add(chosen)
+        self.refugee_used = True
+        self.log(f"  ★ 难民触发: {chosen} ({self.config[chosen]['player']}) 死人变邪恶", 1)
+
+    def _trigger_wounded(self):
+        """伤兵死亡 → 选活人变傀儡"""
+        candidates = self.alive_seats()
+        if not candidates:
+            return
+        # 邪恶选关键威胁
+        weights = []
+        for s in candidates:
+            role = self.config[s]['role']
+            if role in ['军医', '盾卫', '审讯官']:
+                weights.append(0.30)
+            elif role in ['女伯爵', '斥候']:
+                weights.append(0.25)
+            else:
+                weights.append(0.05)
+        chosen = random.choices(candidates, weights=weights)[0]
+        old_role = self.config[chosen]['role']
+        self.config[chosen]['role'] = '傀儡'
+        self.config[chosen]['puppet'] = True
+        self.config[chosen]['register_outsider'] = True
+        if old_role == '女伯爵':
+            self.has_save_baron = False
+        if old_role == '盾卫':
+            self.has_save_shield = False
+        self.log(f"  ★ 伤兵触发: {chosen} ({self.config[chosen]['player']}) 从 {old_role} 变傀儡", 1)
+
+    def _trigger_deserter(self):
+        """逃兵死亡 → 选活人当晚死"""
+        candidates = self.alive_seats()
+        if not candidates:
+            return
+        # 邪恶选关键
+        weights = []
+        for s in candidates:
+            role = self.config[s]['role']
+            if role in ['军医', '审讯官', '斥候']:
+                weights.append(0.30)
+            elif role == '游侠':
+                weights.append(0.05)  # 不杀游侠
+            else:
+                weights.append(0.10)
+        chosen = random.choices(candidates, weights=weights)[0]
+        self.log(f"  ★ 逃兵触发: 选 {chosen} ({self.config[chosen]['player']}) 当晚死", 1)
+        self.kill(chosen, method='夜杀', by_demon=True)
+
+    def _trigger_captive(self):
+        """俘虏死亡 → 选邪恶玩家变爪牙角色立即用"""
+        evil_alive = [s for s in self.config if self.config[s]['alive']
+                       and self.config[s]['team'] == '邪恶'
+                       and not is_demon_role(self.config[s]['role'])]
+        if not evil_alive:
+            return
+        chosen_seat = random.choice(evil_alive)
+        # 邪恶选爪牙角色 (优先 死士 - 复活栈)
+        good_options = ['蛊惑者', '内应', '叛将', '死士']
+        options = []
+        if self.dead_man_active:
+            # 已经有死士活, 选其他
+            options = ['蛊惑者', '内应', '叛将']
         else:
-            threats.append((i, 0.03))
+            options = good_options
+        chosen_role = random.choices(options, weights=[0.3]*len(options))[0]
+        old_role = self.config[chosen_seat]['role']
+        self.config[chosen_seat]['role'] = chosen_role
+        if chosen_role == '死士':
+            self.dead_man_seat = chosen_seat
+            self.dead_man_active = True
+        self.log(f"  ★ 俘虏触发: {chosen_seat} ({self.config[chosen_seat]['player']}) 从 {old_role} 变 {chosen_role}", 1)
 
-    seats, weights = zip(*threats)
-    return random.choices(seats, weights=weights)[0]
+    def _execute_attack(self, target_seat, by_demon=True):
+        """夜晚攻击"""
+        if not self.config[target_seat]['alive']:
+            return
+        # 检查游侠死亡反杀
+        role = self.config[target_seat]['role']
+        if role == '游侠':
+            # 游侠选活人, 如果是非恶魔邪恶则失能并死
+            evil_non_demon = [s for s in self.config if self.config[s]['alive']
+                                and self.config[s]['team'] == '邪恶'
+                                and not is_demon_role(self.config[s]['role'])]
+            if evil_non_demon:
+                rev_target = random.choice(evil_non_demon)
+                self.log(f"  ★ 游侠夜死反杀 {rev_target} ({self.config[rev_target]['player']})", 1)
+                self.kill(rev_target, method='夜杀', by_demon=False)
 
+        # 暗箭手交换检查
+        if (self.demon_role == '暗箭手' and target_seat == self.archer_n1_target
+                and not self.archer_swapped):
+            # 50% 概率使用交换
+            if random.random() < 0.4:
+                evil_alive = [s for s in self.config if self.config[s]['alive']
+                                and self.config[s]['team'] == '邪恶'
+                                and not is_demon_role(self.config[s]['role'])]
+                if evil_alive:
+                    swap_seat = random.choice(evil_alive)
+                    arrow_seat = self.demon_seats[0]
+                    new_demon = self.config[arrow_seat]['role']
+                    self.config[swap_seat]['role'] = new_demon
+                    self.config[swap_seat]['team'] = '邪恶'
+                    self.config[arrow_seat]['role'] = '蛊惑者'  # 简化: 变蛊惑者
+                    self.demon_seats.remove(arrow_seat)
+                    self.demon_seats.append(swap_seat)
+                    self.archer_swapped = True
+                    self.log(f"  ★ 暗箭手交换: {arrow_seat} 与 {swap_seat} 换角色", 1)
 
-def day_execute(config, day_number):
-    """善良处决决策 (基于嫌疑权重 + 不处决概率)"""
-    alive = [i for i in config if config[i]['alive']]
+        # 实际死亡
+        self.kill(target_seat, method='夜杀', by_demon=by_demon)
 
-    # D1 不处决概率 70%, D2 30%, D3+ 10%
-    if day_number == 1:
-        non_exec_prob = 0.70
-    elif day_number == 2:
-        non_exec_prob = 0.30
-    else:
-        non_exec_prob = 0.10
+    def n0_setup(self):
+        """N0 邪恶互知"""
+        self.log("=== N0 邪恶互知 ===")
+        self.log(f"  3 bluffs: {self.bluffs}")
+        if self.dead_man_seat:
+            fake = random.choice(OUTSIDER_POOL)
+            self.log(f"  死士({self.dead_man_seat}) 自以为: {fake}")
 
-    if random.random() < non_exec_prob:
+    def n1_actions(self):
+        """N1 行动"""
+        self.log(f"\n=== N1 ===")
+        # 内应
+        if '内应' in self.minions:
+            mole_seat = next(i for i in self.config if self.config[i]['role'] == '内应')
+            others = self.alive_seats(exclude=[mole_seat])
+            target = random.choice(others)
+            # 内应+目标 D1 早上变傀儡
+            self.config[mole_seat]['puppet_pending'] = True
+            self.config[target]['puppet_pending'] = True
+            self.config[mole_seat]['knows_puppet'] = True
+            self.log(f"  内应({mole_seat}) 选 {target} → D1 早上双变傀儡")
+
+        # 暗箭手 N1 选玩家变傀儡
+        if self.demon_role == '暗箭手':
+            arrow_seat = self.demon_seats[0]
+            others = self.alive_seats(exclude=[arrow_seat])
+            target = random.choice(others)
+            self.archer_n1_target = target
+            self.config[target]['role'] = '傀儡'
+            self.config[target]['puppet'] = True
+            self.config[target]['register_outsider'] = True
+            self.log(f"  暗箭手({arrow_seat}) 选 {target} 变傀儡")
+
+        # 蛊惑者 N1
+        if '蛊惑者' in self.minions:
+            hex_seat = next(i for i in self.config if self.config[i]['role'] == '蛊惑者')
+            left = (hex_seat - 2) % 12 + 1
+            right = hex_seat % 12 + 1
+            if left == 0: left = 12
+            target = random.choice([left, right])
+            self.hex_target = target
+            self.log(f"  蛊惑者({hex_seat}) 蛊惑邻座 {target}")
+
+    def n_kill(self):
+        """夜晚击杀 N>=2"""
+        if not self.demon_seats:
+            return
+
+        # 蛊惑者每晚选 (但 N1 已选, N2+ 续)
+        if '蛊惑者' in [self.config[s]['role'] for s in self.config if self.config[s]['alive']]:
+            hex_seats = [s for s in self.config if self.config[s]['alive'] and self.config[s]['role'] == '蛊惑者']
+            if hex_seats:
+                hex_seat = hex_seats[0]
+                left = (hex_seat - 2) % 12 + 1
+                right = hex_seat % 12 + 1
+                if left == 0: left = 12
+                if self.config[left]['alive'] or self.config[right]['alive']:
+                    candidates = []
+                    if self.config[left]['alive']:
+                        candidates.append(left)
+                    if self.config[right]['alive']:
+                        candidates.append(right)
+                    if candidates:
+                        self.hex_target = random.choice(candidates)
+
+        # 叛将 N2+ 用能力 (15% 概率)
+        if '叛将' in [self.config[s]['role'] for s in self.config if self.config[s]['alive']]:
+            if random.random() < 0.20 and self.day >= 2:
+                turncoat_seat = next(s for s in self.config if self.config[s]['alive'] and self.config[s]['role'] == '叛将')
+                # 让恶魔变其他恶魔角色
+                if self.demon_seats:
+                    new_demon_role = random.choice([d for d in DEMON_POOL if d != self.demon_role])
+                    old_demon_role = self.demon_role
+                    demon_seat = self.demon_seats[0]
+                    self.config[demon_seat]['role'] = new_demon_role
+                    self.config[turncoat_seat]['role'] = '傀儡'
+                    self.config[turncoat_seat]['puppet'] = True
+                    self.config[turncoat_seat]['register_outsider'] = True
+                    self.demon_role = new_demon_role
+                    self.log(f"  叛将({turncoat_seat}) 让 {demon_seat} 变 {new_demon_role}, 自己变傀儡", 1)
+
+        # 攻城将军/暗箭手/先锋官 杀人 (千面人共同)
+        attackable = [s for s in self.config if self.config[s]['alive']
+                      and s not in self.evil_seats]
+
+        # 千面人共同选择
+        if any('千面人' in self.config[s]['role'] for s in self.config if self.config[s]['alive']):
+            # 多个千面人共同选择
+            target = self._choose_kill_target(attackable)
+            if target:
+                self.log(f"  千面人共同杀: {target}")
+                self._execute_attack(target)
+        else:
+            # 单恶魔杀
+            if self.demon_seats and self.config[self.demon_seats[0]]['alive']:
+                target = self._choose_kill_target(attackable)
+                if target:
+                    self.log(f"  {self.config[self.demon_seats[0]]['role']}({self.demon_seats[0]}) 杀: {target}")
+                    self._execute_attack(target)
+
+    def _choose_kill_target(self, candidates):
+        """邪恶选击杀目标 - 按威胁优先级"""
+        if not candidates:
+            return None
+        weights = []
+        for s in candidates:
+            role = self.config[s]['role']
+            # 不杀游侠 (会反杀)
+            if role == '游侠':
+                weights.append(0.05)
+                continue
+            # 杀外来者会触发链 - 但有保险栓不触发
+            if role in OUTSIDER_POOL or role == '傀儡':
+                if self.has_save_shield:
+                    weights.append(0.05)  # 没用
+                else:
+                    weights.append(0.25)  # 触发链
+            elif role == '斥候' and self.day < 3:
+                weights.append(0.30)  # D3 之前必杀
+            elif role == '军医':
+                weights.append(0.15)
+            elif role == '女伯爵':
+                weights.append(0.20)
+            elif role == '盾卫':
+                weights.append(0.20)
+            elif role == '审讯官':
+                weights.append(0.10)
+            else:
+                weights.append(0.05)
+        return random.choices(candidates, weights=weights)[0]
+
+    def d1_morning(self):
+        """D1 黎明: 处理 内应延迟变傀儡"""
+        for s in self.config:
+            if self.config[s].get('puppet_pending'):
+                self.config[s]['role'] = '傀儡'
+                self.config[s]['puppet'] = True
+                self.config[s]['register_outsider'] = True
+                self.config[s].pop('puppet_pending', None)
+        # 对于 暗箭手 N1 选的, 已经在 n1 时变傀儡
+
+    def day_execute(self):
+        """善良处决决策"""
+        alive = self.alive_seats()
+        if not alive:
+            return None
+
+        # D1 不处决概率
+        if self.day == 1:
+            non_exec = 0.65
+        elif self.day == 2:
+            non_exec = 0.30
+        else:
+            non_exec = 0.10
+
+        # 决战日(alive==4) 必须处决
+        if len(alive) <= 4:
+            non_exec = 0.05
+
+        if random.random() < non_exec:
+            self.log(f"  D{self.day} 不处决")
+            return None
+
+        # 嫌疑权重
+        suspects = []
+        for s in alive:
+            role = self.config[s]['role']
+            team = self.config[s]['team']
+            if team == '邪恶':
+                if is_demon_role(role):
+                    suspects.append((s, 0.45))
+                else:
+                    suspects.append((s, 0.50))
+            elif team == '外来者':
+                # 善良怕处决外来者(触发链)
+                if not self.has_save_baron:
+                    suspects.append((s, 0.05))  # 怕触发, 低概率
+                else:
+                    suspects.append((s, 0.10))
+            else:
+                suspects.append((s, 0.05))
+
+        # 加上死人投票 (善良已知的 evil_dead_votes 影响投票通过)
+        # 简化: 没人变邪恶死人时正常通过, 有死票时降低过半概率
+        seats, weights = zip(*suspects)
+        norm = [w/sum(weights) for w in weights]
+        target = random.choices(seats, weights=norm)[0]
+
+        # 模拟投票通过 (善良alignment 投率 / alive)
+        good_alive = [s for s in alive if self.config[s]['team'] != '邪恶']
+        evil_dead_total = len(self.evil_dead_votes)
+
+        # 简单模型: 如果 嫌疑 真的邪恶, 善良会通过 80% 概率; 否则 60%
+        actually_evil = self.config[target]['team'] == '邪恶'
+        pass_prob = 0.85 if actually_evil else 0.55
+        # 死票邪恶 减成功率
+        pass_prob -= evil_dead_total * 0.05
+
+        if random.random() > pass_prob:
+            self.log(f"  D{self.day} 提名 {target} 失败 (投票不过)")
+            return None
+
+        self.log(f"  D{self.day} 处决: {target} ({self.config[target]['player']}, {self.config[target]['role']})")
+        self.kill(target, method='处决')
+        return target
+
+    def check_win(self):
+        alive = self.alive_seats()
+        demons_alive = self.alive_demons()
+        if not demons_alive:
+            return '善良'
+        if len(alive) <= 2 and demons_alive:
+            return '邪恶'
         return None
 
-    # 嫌疑权重 (基于 register team + 是否公开身份)
-    suspects = []
-    for s in alive:
-        role = config[s]['role']
-        team = config[s]['team']
-        if team == '邪恶':
-            if role in DEMON_POOL or '千面人' in role:
-                suspects.append((s, 0.45))  # 恶魔
+    def play(self):
+        """完整游戏"""
+        self.print_config()
+        self.n0_setup()
+        self.day = 1
+
+        max_days = 8
+        while self.day <= max_days:
+            # 夜晚
+            if self.day == 1:
+                self.n1_actions()
+                self.d1_morning()
             else:
-                suspects.append((s, 0.50))  # 爪牙
-        elif team == '外来者':
-            suspects.append((s, 0.10))
-        else:
-            suspects.append((s, 0.05))  # 镇民
+                self.log(f"\n=== N{self.day} ===")
+                self.n_kill()
 
-    seats, weights = zip(*suspects)
-    norm = [w/sum(weights) for w in weights]
-    return random.choices(seats, weights=norm)[0]
+            # 检查胜负
+            w = self.check_win()
+            if w:
+                return w, self.day
 
+            # 白天
+            self.log(f"\n=== D{self.day} ===")
+            self.day_execute()
 
-def check_win(config, setup_info):
-    """检查胜负"""
-    alive = [i for i in config if config[i]['alive']]
-    demons_alive = [i for i in alive
-                     if config[i]['role'] in DEMON_POOL or
-                        '千面人' in config[i]['role']]
-    if not demons_alive:
-        return '善良'
-    if len(alive) <= 2 and demons_alive:
-        return '邪恶'
-    return None
+            # 检查胜负
+            w = self.check_win()
+            if w:
+                return w, self.day
+
+            self.day += 1
+
+        return '平局/超时', self.day - 1
 
 
-def run_game(verbose=True):
-    """跑一局完整推演"""
-    config, setup_info = generate_config()
-    decisions = evil_setup_decisions(config, setup_info)
-    self_bust = real_outsider_self_bust(config, setup_info)
-    n1 = n1_actions(config, setup_info)
-
-    if verbose:
-        print(f"\n=== 配置 ===")
-        print(f"恶魔: {setup_info['demon']}, 爪牙: {setup_info['minions']}")
-        print(f"外来者: {setup_info['outsiders']}")
-        print(f"镇民: {setup_info['townsfolk']}")
-        print(f"Bluffs: {setup_info['bluffs']}")
-        for i in sorted(config):
-            print(f"  {i}. {config[i]['player']}: {config[i]['role']} ({config[i]['team']})")
-
-    # 简化的推演循环
-    day = 1
-    death_log = []
-    max_days = 8
-
-    while day <= max_days:
-        # 夜晚击杀
-        if day > 1:
-            try:
-                kill_target = night_kill_choice(config, setup_info['demon'])
-                config[kill_target]['alive'] = False
-                death_log.append((f'N{day}', kill_target, config[kill_target]['role']))
-                if verbose:
-                    print(f"N{day} 杀: {kill_target} ({config[kill_target]['player']}, {config[kill_target]['role']})")
-            except (StopIteration, ValueError):
-                pass
-
-        # 检查胜负
-        winner = check_win(config, setup_info)
-        if winner:
-            return winner, day - 1, death_log
-
-        # 白天处决
-        exec_target = day_execute(config, day)
-        if exec_target:
-            config[exec_target]['alive'] = False
-            death_log.append((f'D{day}', exec_target, config[exec_target]['role']))
-            if verbose:
-                print(f"D{day} 处决: {exec_target} ({config[exec_target]['player']}, {config[exec_target]['role']})")
-        else:
-            if verbose:
-                print(f"D{day} 不处决")
-
-        # 检查胜负
-        winner = check_win(config, setup_info)
-        if winner:
-            return winner, day, death_log
-
-        day += 1
-
-    return '平局/超时', day, death_log
-
-
-def run_batch(n=30):
-    """跑 n 局看胜率"""
+def run_batch(n=30, verbose=False):
     results = {'善良': 0, '邪恶': 0, '平局/超时': 0}
     days_total = 0
-    print(f"\n=== 跑 {n} 局 (简化推演) ===")
+    print(f"\n=== 跑 {n} 局 ===\n")
     for i in range(n):
-        winner, days, _ = run_game(verbose=False)
+        g = Game(verbose=verbose)
+        winner, days = g.play()
         results[winner] += 1
         days_total += days
-    print(f"\n善良: {results['善良']}/{n} = {results['善良']*100/n:.1f}%")
+        if verbose:
+            print(f"\n>>> 第 {i+1} 局: {winner}胜, {days} 天\n" + "="*60)
+
+    print(f"\n=== 结果 ===")
+    print(f"善良: {results['善良']}/{n} = {results['善良']*100/n:.1f}%")
     print(f"邪恶: {results['邪恶']}/{n} = {results['邪恶']*100/n:.1f}%")
     if results['平局/超时'] > 0:
         print(f"平局/超时: {results['平局/超时']}")
@@ -379,17 +660,22 @@ def run_batch(n=30):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) > 1:
+    args = sys.argv[1:]
+    verbose = '-v' in args
+    args = [a for a in args if a != '-v']
+
+    if args:
         try:
-            n = int(sys.argv[1])
-            run_batch(n)
+            n = int(args[0])
+            run_batch(n, verbose=verbose)
         except ValueError:
-            print("Usage: python3 botc_simulator.py [n_games]")
+            print("Usage: python3 botc_simulator.py [n_games] [-v]")
             sys.exit(1)
     else:
-        winner, days, deaths = run_game(verbose=True)
+        g = Game(verbose=True)
+        winner, days = g.play()
         print(f"\n=== 胜负 ===")
         print(f"{winner}胜, 用时 {days} 天")
         print(f"\n死亡顺序:")
-        for time, seat, role in deaths:
+        for time, seat, role in g.deaths:
             print(f"  {time}: 座 {seat} ({role})")
