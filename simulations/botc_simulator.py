@@ -27,6 +27,8 @@ TOWNSFOLK_POOL = [
     '斥候', '密探', '巡逻兵', '审讯官', '游侠', '军医',
     '书记官', '军需官', '牧师', '纹章官', '盾卫', '女伯爵', '瞭望兵'
 ]
+# 信息源镇民 (产生推理用信息) — 死亡 → 信息真空
+INFO_SOURCES = {'斥候', '密探', '巡逻兵', '审讯官', '书记官', '纹章官', '瞭望兵'}
 OUTSIDER_POOL = ['伤兵', '逃兵', '难民', '俘虏']
 MINION_POOL = ['内应', '蛊惑者', '叛将', '死士']
 DEMON_POOL = ['攻城将军', '先锋官', '千面人', '暗箭手']
@@ -81,7 +83,20 @@ class Game:
         # 难民变邪恶死人
         self.evil_dead_votes = set()
 
+        # 假信息流 / 信任崩塌追踪 (v3 新增)
+        self.demons_killed = 0  # 已死恶魔总数 (含千面人)
+        self.hex_died_day = None  # 蛊惑者死亡日 (用于残留期判定)
+        self.first_demon_kill_day = None  # 第一个恶魔死亡日 (千面人信任崩塌起点)
+
+        # 信息真空追踪
+        self.initial_info_sources = 0  # setup 时信息源镇民总数
+
         self._generate_config()
+        # setup 后统计初始信息源
+        self.initial_info_sources = sum(
+            1 for s in self.config
+            if self.config[s]['role'] in INFO_SOURCES
+        )
 
     def log(self, msg, indent=0):
         if self.verbose:
@@ -91,6 +106,8 @@ class Game:
         """生成 12 人随机配置"""
         demon = random.choice(DEMON_POOL)
         minions_raw = random.sample(MINION_POOL, 2)
+
+        self.is_lunatic_setup = (demon == '千面人')  # 锁定原始 setup, 不被叛将变身改
 
         if demon == '千面人':
             outsider_count = 1
@@ -133,6 +150,29 @@ class Game:
             else:
                 team = "镇民"
 
+            # 爪牙/恶魔 bluff 战术
+            # 爪牙: 装外来者 60%, 装镇民 40%
+            # 恶魔: 用 N0 给的 3 bluffs 之一装镇民 (不能装外来者)
+            # 千面人: 自以为镇民, 完全装镇民
+            # bluff_until_day = 善良识破伪装的那一天
+            bluff_type = None
+            bluff_until_day = 0
+            if is_minion:
+                bluff_type = random.choices(
+                    ['outsider', 'townsfolk'], weights=[0.60, 0.40]
+                )[0]
+                bluff_until_day = random.randint(3, 5)
+            elif is_demon:
+                if '千面人' in r:
+                    # 千面人 N0 互知, 共同装镇民 bluff
+                    # 善良知道 setup 有多恶魔, 主动找 → 识破较早
+                    bluff_type = 'townsfolk'
+                    bluff_until_day = random.randint(3, 4)
+                else:
+                    # 单恶魔用 N0 给的 bluff 装镇民 (D4-D6 被锁)
+                    bluff_type = 'townsfolk'
+                    bluff_until_day = random.randint(4, 6)
+
             self.config[i] = {
                 'player': p,
                 'role': r,
@@ -143,6 +183,8 @@ class Game:
                 'register_outsider': r in outsiders or r == '死士' or '千面人' in r,
                 'register_minion': is_minion or r == '死士' or '千面人' in r,
                 'self_busted': False,
+                'bluff_type': bluff_type,  # 爪牙伪装类型
+                'bluff_until_day': bluff_until_day,  # 善良识破日
             }
             if team == "邪恶":
                 self.evil_seats.append(i)
@@ -189,6 +231,14 @@ class Game:
             self.has_save_baron = False
         if self.config[seat]['role'] == '盾卫':
             self.has_save_shield = False
+
+        # 假信息流 / 信任崩塌追踪
+        if self.config[seat]['role'] == '蛊惑者':
+            self.hex_died_day = self.day
+        if is_demon_role(self.config[seat]['role']):
+            self.demons_killed += 1
+            if self.first_demon_kill_day is None:
+                self.first_demon_kill_day = self.day
 
         # 死士复活栈检查 - 如果恶魔死, 死士变恶魔
         if is_demon_role(self.config[seat]['role']) and self.dead_man_active:
@@ -411,16 +461,18 @@ class Game:
             self.config[mole_seat]['knows_puppet'] = True
             self.log(f"  内应({mole_seat}) 选 {target} → D1 早上双变傀儡")
 
-        # 暗箭手 N1 选玩家变傀儡
+        # 暗箭手 N1 选玩家变傀儡 (不选队友)
         if self.demon_role == '暗箭手':
             arrow_seat = self.demon_seats[0]
-            others = self.alive_seats(exclude=[arrow_seat])
-            target = random.choice(others)
-            self.archer_n1_target = target
-            self.config[target]['role'] = '傀儡'
-            self.config[target]['puppet'] = True
-            self.config[target]['register_outsider'] = True
-            self.log(f"  暗箭手({arrow_seat}) 选 {target} 变傀儡")
+            others = [s for s in self.alive_seats(exclude=[arrow_seat])
+                       if s not in self.evil_seats]
+            if others:
+                target = random.choice(others)
+                self.archer_n1_target = target
+                self.config[target]['role'] = '傀儡'
+                self.config[target]['puppet'] = True
+                self.config[target]['register_outsider'] = True
+                self.log(f"  暗箭手({arrow_seat}) 选 {target} 变傀儡")
 
         # 蛊惑者 N1
         if '蛊惑者' in self.minions:
@@ -531,20 +583,20 @@ class Game:
         # 对于 暗箭手 N1 选的, 已经在 n1 时变傀儡
 
     def day_execute(self):
-        """善良处决决策"""
+        """善良处决决策 (基于嫌疑+信息累积+真实玩家失误率)"""
         alive = self.alive_seats()
         if not alive:
             return None
 
-        # D1 不处决概率
+        # 不处决概率 (高玩 D1-D2 谨慎, D3+ 必动)
         if self.day == 1:
-            non_exec = 0.65
+            non_exec = 0.70
         elif self.day == 2:
-            non_exec = 0.30
+            non_exec = 0.35
         else:
             non_exec = 0.10
 
-        # 决战日(alive==4) 必须处决
+        # 决战日(alive<=4) 必须处决
         if len(alive) <= 4:
             non_exec = 0.05
 
@@ -552,43 +604,109 @@ class Game:
             self.log(f"  D{self.day} 不处决")
             return None
 
-        # 嫌疑权重
+        # 嫌疑权重 - 真实玩家 D1 几乎随机, D 越大信息越多
+        # 这模拟"信息累积让锁定速度增加"
+        evil_weight_by_day = {
+            1: 0.10, 2: 0.15, 3: 0.30, 4: 0.50, 5: 0.70, 6: 0.85, 7: 0.90,
+        }
+        evil_w = evil_weight_by_day.get(self.day, 0.90)
+        good_w = 0.10  # 善良误杀基线
+        outsider_w = 0.02  # 外来者很少处决 (自爆 = 善良信任)
+
+        # === 假信息流 (蛊惑者污染) ===
+        # 蛊惑者活着 → 信息源被污染, 善良 alignment 推断不准
+        hex_alive = any(self.config[s]['alive'] and self.config[s]['role'] == '蛊惑者'
+                        for s in self.config)
+        hex_residual = (self.hex_died_day is not None
+                        and 0 < self.day - self.hex_died_day <= 2)
+        if hex_alive:
+            # 蛊惑者活: 假信息持续注入
+            evil_w *= 0.60
+            good_w *= 1.40
+            self.log(f"  [蛊惑者活] 假信息流 → 锁定能力 -40%, 误杀率 +40%", 1)
+        elif hex_residual:
+            # 蛊惑者死后 1-2 天残留: 善良还在消化历史假信息
+            evil_w *= 0.80
+            good_w *= 1.20
+            self.log(f"  [蛊惑者残留] 历史假信息 → 锁定能力 -20%", 1)
+
+        # === 信息真空崩塌 ===
+        # 信息源被夜杀挖空 → 善良只能凭旧信息+行为推理 → 锁定能力下降, 错杀飙升
+        if self.initial_info_sources > 0:
+            dead_info = sum(
+                1 for s in self.config
+                if not self.config[s]['alive']
+                and self.config[s].get('original_role') in INFO_SOURCES
+            )
+            vacuum_ratio = dead_info / self.initial_info_sources
+            if vacuum_ratio >= 0.75:
+                evil_w *= 0.50
+                good_w *= 3.0
+                outsider_w *= 2.5
+                self.log(f"  [信息真空 严重] 信息源死亡 {dead_info}/{self.initial_info_sources} → 锁定 -50%, 错杀 ×3", 1)
+            elif vacuum_ratio >= 0.50:
+                evil_w *= 0.70
+                good_w *= 2.0
+                outsider_w *= 1.8
+                self.log(f"  [信息真空] 信息源死亡 {dead_info}/{self.initial_info_sources} → 锁定 -30%, 错杀 ×2", 1)
+
+        # === 千面人信任崩塌 ===
+        # 千面人 setup: 处决1恶魔但游戏没结束 → 善良发现"还有恶魔" → 信任崩塌
+        # 真实玩家崩塌 ≠ 不处决, 崩塌 = 错杀(嫌疑洗牌+邪恶引导)
+        if (self.is_lunatic_setup and self.demons_killed >= 1
+                and len(self.alive_demons()) >= 1):
+            # 信任崩塌: 锁定能力跌, 错杀率飙
+            collapse_factor = 0.50 if self.demons_killed == 1 else 0.65
+            evil_w *= collapse_factor
+            good_w *= 3.0  # 错杀率飙升 (善良乱杀 + 邪恶发言引导)
+            outsider_w *= 2.0  # 外来者也成为嫌疑目标
+            self.log(f"  [千面人信任崩塌] 已死{self.demons_killed}恶魔仍有恶魔 → 锁定 -{int((1-collapse_factor)*100)}%, 错杀率 ×3", 1)
+
+        # 自爆角色 (公开身份的) 嫌疑降低
+        # 这里简化: 真外来者已经"看起来善良" (假设他们 D1 自爆), 不应处决
         suspects = []
         for s in alive:
-            role = self.config[s]['role']
             team = self.config[s]['team']
+            role = self.config[s]['role']
+            c = self.config[s]
             if team == '邪恶':
-                if is_demon_role(role):
-                    suspects.append((s, 0.45))
+                # 爪牙 bluff 战术: 在被识破前嫌疑等同于装的角色
+                bluff_type = c.get('bluff_type')
+                bluff_until = c.get('bluff_until_day', 0)
+                if bluff_type and self.day < bluff_until:
+                    if bluff_type == 'outsider':
+                        # 装外来者 → 自爆免死金牌, 比真外来者还安全
+                        w = outsider_w * 0.7
+                    else:  # 装镇民
+                        # 装镇民 → 善良信任直到识破
+                        w = good_w
+                elif bluff_type and self.day == bluff_until:
+                    # 识破当天: 半信半疑
+                    w = evil_w * 0.5
                 else:
-                    suspects.append((s, 0.50))
-            elif team == '外来者':
-                # 善良怕处决外来者(触发链)
-                if not self.has_save_baron:
-                    suspects.append((s, 0.05))  # 怕触发, 低概率
-                else:
-                    suspects.append((s, 0.10))
+                    # 已识破: 全嫌疑
+                    w = evil_w
+            elif team == '外来者' or role == '傀儡':
+                w = outsider_w  # 外来者+傀儡 (但 register 外来者) 都很少处决
             else:
-                suspects.append((s, 0.05))
+                w = good_w
+            suspects.append((s, w))
 
-        # 加上死人投票 (善良已知的 evil_dead_votes 影响投票通过)
-        # 简化: 没人变邪恶死人时正常通过, 有死票时降低过半概率
         seats, weights = zip(*suspects)
         norm = [w/sum(weights) for w in weights]
         target = random.choices(seats, weights=norm)[0]
 
-        # 模拟投票通过 (善良alignment 投率 / alive)
-        good_alive = [s for s in alive if self.config[s]['team'] != '邪恶']
-        evil_dead_total = len(self.evil_dead_votes)
-
-        # 简单模型: 如果 嫌疑 真的邪恶, 善良会通过 80% 概率; 否则 60%
+        # 投票通过率 - 真邪恶通过率高, 错杀通过率低
         actually_evil = self.config[target]['team'] == '邪恶'
-        pass_prob = 0.85 if actually_evil else 0.55
-        # 死票邪恶 减成功率
-        pass_prob -= evil_dead_total * 0.05
+        evil_dead_total = len(self.evil_dead_votes)
+        if actually_evil:
+            pass_prob = 0.80
+        else:
+            pass_prob = 0.40  # 错杀难通过 (善良会犹豫)
+        pass_prob -= evil_dead_total * 0.06  # 邪恶死票阻投票
 
         if random.random() > pass_prob:
-            self.log(f"  D{self.day} 提名 {target} 失败 (投票不过)")
+            self.log(f"  D{self.day} 提名 {target} ({self.config[target]['player']}) 失败")
             return None
 
         self.log(f"  D{self.day} 处决: {target} ({self.config[target]['player']}, {self.config[target]['role']})")
@@ -610,7 +728,7 @@ class Game:
         self.n0_setup()
         self.day = 1
 
-        max_days = 8
+        max_days = 15  # 真实游戏不超时, 给足窗口让游戏自然结束
         while self.day <= max_days:
             # 夜晚
             if self.day == 1:
