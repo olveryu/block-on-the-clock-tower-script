@@ -75,7 +75,7 @@ Inquisitor (detect evil), Herald/Patrolman (detect Outsiders), Coroner (autopsy)
 | Siege Lord | Each night, you see the Grimoire. Each night*, choose a player: they die. |
 | Shadow Archer | On your first night, choose a player: they become the Puppet. Each night*, choose a player: they die. If you kill the player you chose on your first night, you may swap characters with an evil player. |
 | Vanguard | Each night*, choose a player: they die. Outsiders also register as the Puppet. [+1 Outsider] |
-| Shapeshifter | Each night*, the Shapeshifters must jointly choose a player: they die. When you die, trigger the Puppet's death ability. You also register as an Outsider and a Minion. [During setup, Minions become Shapeshifters, -1 Outsider] |
+| Shapeshifter | Each night*, the Shapeshifters must jointly choose a player: they die. When you die, trigger the Puppet's death ability. You also register as an Outsider and a Minion. [During setup, Minions become Shapeshifters] |
 
 ---
 
@@ -129,7 +129,7 @@ Inquisitor (detect evil), Herald/Patrolman (detect Outsiders), Coroner (autopsy)
 
 **Setup modifiers:**
 - Turncoat: +1 Outsider
-- Shapeshifter: All Minions become Shapeshifters, -1 Outsider
+- Shapeshifter: All Minions become Shapeshifters
 - Puppet: Does not appear during setup
 
 ### Demon Selection Tips

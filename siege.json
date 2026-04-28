@@ -32,16 +32,6 @@
     "otherNight": 17
   },
   {
-    "id": "7_siege",
-    "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/7_weicheng.png",
-    "firstNightReminder": "On your first night, you learn the sum of all Outsider players' seat numbers.",
-    "reminders": [],
-    "name": "Scribe",
-    "team": "townsfolk",
-    "ability": "On your first night, you learn the sum of all Outsider players' seat numbers.",
-    "firstNight": 19
-  },
-  {
     "id": "9_siege",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/9_weicheng.png",
     "firstNightReminder": "Each night, you learn how many alive players are no longer their original character.",
@@ -52,6 +42,16 @@
     "ability": "Each night, you learn how many alive players are no longer their original character.",
     "firstNight": 21,
     "otherNight": 23
+  },
+  {
+    "id": "7_siege",
+    "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/7_weicheng.png",
+    "firstNightReminder": "On your first night, you learn the sum of all Outsider players' seat numbers.",
+    "reminders": [],
+    "name": "Scribe",
+    "team": "townsfolk",
+    "ability": "On your first night, you learn the sum of all Outsider players' seat numbers.",
+    "firstNight": 19
   },
   {
     "id": "4_siege",
@@ -286,7 +286,7 @@
     "setup": true,
     "name": "Shapeshifter",
     "team": "demon",
-    "ability": "Each night*, the Shapeshifters must jointly choose a player: they die. When you die, trigger the Puppet's death ability. You also register as an Outsider and a Minion. [During setup, Minions become Shapeshifters, -1 Outsider]",
+    "ability": "Each night*, the Shapeshifters must jointly choose a player: they die. When you die, trigger the Puppet's death ability. You also register as an Outsider and a Minion. [During setup, Minions become Shapeshifters]",
     "otherNight": 9,
     "otherNightReminder": "Each night*, the Shapeshifters must jointly choose a player: they die. When you die, trigger the Puppet's death ability. You also register as an Outsider and a Minion. [During setup, Minions become Shapeshifters, -1 Outsider]"
   },

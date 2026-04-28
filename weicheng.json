@@ -32,16 +32,6 @@
     "otherNight": 17
   },
   {
-    "id": "7_weicheng",
-    "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/7_weicheng.png",
-    "firstNightReminder": "在你的首个夜晚，你会得知所有外来者玩家的座位号之和。",
-    "reminders": [],
-    "name": "书记官",
-    "team": "townsfolk",
-    "ability": "在你的首个夜晚，你会得知所有外来者玩家的座位号之和。",
-    "firstNight": 19
-  },
-  {
     "id": "9_weicheng",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/9_weicheng.png",
     "firstNightReminder": "每个夜晚，你会得知有多少名存活玩家不再是最初的角色。",
@@ -52,6 +42,16 @@
     "ability": "每个夜晚，你会得知有多少名存活玩家不再是最初的角色。",
     "firstNight": 21,
     "otherNight": 23
+  },
+  {
+    "id": "7_weicheng",
+    "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/7_weicheng.png",
+    "firstNightReminder": "在你的首个夜晚，你会得知所有外来者玩家的座位号之和。",
+    "reminders": [],
+    "name": "书记官",
+    "team": "townsfolk",
+    "ability": "在你的首个夜晚，你会得知所有外来者玩家的座位号之和。",
+    "firstNight": 19
   },
   {
     "id": "4_weicheng",
@@ -286,7 +286,7 @@
     "setup": true,
     "name": "千面人",
     "team": "demon",
-    "ability": "每个夜晚*，千面人要共同选择一名玩家：他死亡。当你死亡，触发傀儡的死亡效果。你同时被视为一名外来者和爪牙角色。[配置时爪牙变成千面人，-1 外来者]",
+    "ability": "每个夜晚*，千面人要共同选择一名玩家：他死亡。当你死亡，触发傀儡的死亡效果。你同时被视为一名外来者和爪牙角色。[配置时爪牙变成千面人]",
     "otherNight": 9,
     "otherNightReminder": "千面人要共同选择一名玩家：他死亡。如果千面人今晚死亡，触发傀儡的死亡效果。"
   },
