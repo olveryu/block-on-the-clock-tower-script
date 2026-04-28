@@ -87,14 +87,15 @@
   {
     "id": "6_weicheng",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/6_weicheng.png",
-    "otherNightReminder": "每个夜晚*，选择一名死亡玩家：你会得知他是否邪恶。",
+    "otherNightReminder": "每个夜晚*，选择一名玩家：如果他已死亡，你会得知他是否邪恶；如果他存活，你会得知他今晚是否被唤醒。",
     "reminders": [
-      "验尸"
+      "验尸",
+      "监测"
     ],
     "name": "军医",
     "team": "townsfolk",
-    "ability": "每个夜晚*，选择一名死亡玩家：你会得知他是否邪恶。",
-    "otherNight": 18
+    "ability": "每个夜晚*，选择一名玩家：如果他已死亡，你会得知他是否邪恶；如果他存活，你会得知他今晚是否被唤醒。",
+    "otherNight": 22
   },
   {
     "id": "7_weicheng",
