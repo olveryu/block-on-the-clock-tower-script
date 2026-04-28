@@ -19,9 +19,9 @@ When Outsiders die, chain effects trigger: extra kills (Deserter), alignment con
 The Shieldbearer blocks night death chain effects (Outsiders still die, but effects don't trigger); the Baroness blocks execution chain effects. Good must leverage both lines of defense.
 
 🎭 **Four Distinct Demons**
-- **Siege Lord** — Sees all characters on the first night. Pure information dominance.
+- **Siege Lord** — Sees the Grimoire each night. Pure information dominance.
 - **Shadow Archer** — Creates a Puppet on the first night. Can swap characters to hide identity.
-- **Vanguard** — Killing Outsiders creates additional Puppets.
+- **Vanguard** — Outsiders also register as Puppet. Chain explosion potential.
 - **Shapeshifter** — All Minions become Shapeshifters. Multiple Demons coordinate kills.
 
 🕵️ **Rich Information Roles**
@@ -46,7 +46,7 @@ Inquisitor (detect evil), Herald/Patrolman (detect Outsiders), Coroner (autopsy)
 | Herald | Each day, you may privately visit the Storyteller and name 3 players: you learn if exactly one of them is an Outsider. |
 | Ranger | If you die at night, choose an alive player: if they are a non-Demon evil player, they lose their ability and die. |
 | Inquisitor | Each night, choose 3 other alive players: you learn if any is a non-Demon evil player. |
-| Patrolman | Each night, choose a player: you learn if either alive neighbour of that player is an Outsider. |
+| Patrolman | Each night, choose a player: you learn if either alive neighbor of that player is an Outsider. |
 | Scout | On your first night, you learn 2 Demon characters; one is in play. From day 3, during the day, you may privately ask the Storyteller: learn the Demon character. |
 
 ### Outsiders (5)
@@ -66,7 +66,7 @@ Inquisitor (detect evil), Herald/Patrolman (detect Outsiders), Coroner (autopsy)
 | Mole | On your first night, choose an alive player: at the start of tomorrow's day, you both become the Puppet. |
 | Undead | You think you are an Outsider character, but you are not. You also register as an Outsider. If the Demon dies, you become that Demon. When you die, trigger the Puppet's death ability. The Demon and Minions know you are the Undead. |
 | Turncoat | Each night*, you may choose a Demon character: choose to make yourself or the Demon become that character; the other becomes the Puppet. [+1 Outsider] |
-| Hexer | Each night, choose an alive neighbour: they become the Puppet tonight and tomorrow's day. |
+| Hexer | Each night, choose an alive neighbor: they become the Puppet tonight and tomorrow day. |
 
 ### Demons (4)
 
@@ -87,11 +87,11 @@ Inquisitor (detect evil), Herald/Patrolman (detect Outsiders), Coroner (autopsy)
 
 1. **Protect information**: Don't reveal your role on day 1. Build trust through private conversations first. High-value roles (Scout, Baroness, Shieldbearer) should stay hidden — revealing means getting killed at night.
 
-2. **Beware the Hexer**: The Hexer turns a neighbour into a Puppet (=poisoned) each night. Your information might be false. When you get odd info, first ask "Am I hexed?" rather than trusting blindly.
+2. **Beware the Hexer**: The Hexer turns a neighbor into a Puppet (=poisoned) each night. Your information might be false. When you get odd info, first ask "Am I hexed?" rather than trusting blindly.
 
 3. **Use Outsider chains to reason**: If Shieldbearer/Baroness is alive but Outsider death didn't chain → the effect was blocked → indirectly confirms Shieldbearer/Baroness identity.
 
-4. **Locate the Hexer**: The Hexer can only pick neighbours. If your info was wrong, check your neighbours — the Hexer might be nearby.
+4. **Locate the Hexer**: The Hexer can only pick neighbors. If your info was wrong, check your neighbors — the Hexer might be nearby.
 
 5. **Watch for Puppets**: Puppets think they're good. If someone's information is consistently contradictory, they might be an unwitting Puppet.
 
@@ -145,7 +145,7 @@ Inquisitor (detect evil), Herald/Patrolman (detect Outsiders), Coroner (autopsy)
 
 1. **Resolve night strictly in order**: Follow firstNight / otherNight numbers ascending. Hexer(2) → Turncoat(3) → Demons(6-9) → Outsider death effects(10-13) → Townsfolk info(14-21).
 
-2. **Hexer's Puppet effect**: The hexed player becomes a Puppet "tonight and tomorrow's day". This means tonight's info is false and tomorrow's day ability is also nullified.
+2. **Hexer's Puppet effect**: The hexed player becomes a Puppet "tonight and tomorrow day". This means tonight's info is false and tomorrow's day ability is also nullified.
 
 3. **Chain or no chain?** Shieldbearer alive → night Outsider deaths don't trigger effects (but they still die). Baroness alive → executions don't trigger Outsider effects. They don't overlap.
 
