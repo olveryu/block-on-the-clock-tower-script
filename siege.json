@@ -197,7 +197,9 @@
     "setup": true,
     "name": "Puppet",
     "team": "outsider",
-    "ability": "You think you are a good character, but you are not. When you die, that night the Demon must choose an Outsider character: trigger that Outsider's death ability. [Does not appear during setup]"
+    "ability": "You think you are a good character, but you are not. When you die, that night the Demon must choose an Outsider character: trigger that Outsider's death ability. [Does not appear during setup]",
+    "otherNight": 14,
+    "otherNightReminder": "If the Puppet died tonight, the Demon must choose an Outsider character: trigger that Outsider's death ability."
   },
   {
     "id": "18_siege",
