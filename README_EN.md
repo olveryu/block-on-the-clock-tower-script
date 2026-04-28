@@ -37,9 +37,9 @@ Inquisitor (detect evil), Herald/Patrolman (detect Outsiders), Coroner (autopsy)
 |-----------|---------|
 | Lookout | Each night, you learn 1 Minion or Outsider character that is not in play. |
 | Spy Hunter | Each day, you may privately visit the Storyteller and name 2 players: the Storyteller tells you which is closer to a Minion. |
-| Coroner | Each night*, choose a player: if they are dead, you learn if they are evil; if they are alive, you learn if they were woken tonight. |
+| Coroner | Each night, choose a player: if they are dead, you learn if they are evil; if they are alive, you learn if they were woken tonight. |
 | Quartermaster | Each day, you may publicly choose a player: if they are a Minion or Outsider, they are drunk until next dawn. |
-| Chaplain | Each night*, choose an alive player: you learn if they are their original character. |
+| Chaplain | Each night, you learn how many alive players are no longer their original character. |
 | Shieldbearer | While you are alive, Outsiders do not trigger their death effects when dying at night. |
 | Baroness | While you are alive, executed players do not trigger Outsider death effects. |
 | Scribe | On your first night, you learn the sum of all Outsider players' seat numbers. |
