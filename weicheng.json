@@ -122,7 +122,7 @@
   {
     "id": "6_weicheng",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/6_weicheng.png",
-"firstNightReminder": "每个夜晚，选择一名玩家：如果他已死亡，你会得知他是否邪恶；如果他存活，你会得知他今晚是否被唤醒。",
+    "firstNightReminder": "每个夜晚，选择一名玩家：如果他已死亡，你会得知他是否邪恶；如果他存活，你会得知他今晚是否被唤醒。",
     "otherNightReminder": "每个夜晚，选择一名玩家：如果他已死亡，你会得知他是否邪恶；如果他存活，你会得知他今晚是否被唤醒。",
     "reminders": [
       "验尸",

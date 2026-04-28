@@ -288,7 +288,7 @@
     "team": "demon",
     "ability": "Each night*, the Shapeshifters must jointly choose a player: they die. When you die, trigger the Puppet's death ability. You also register as an Outsider and a Minion. [During setup, Minions become Shapeshifters]",
     "otherNight": 9,
-    "otherNightReminder": "Each night*, the Shapeshifters must jointly choose a player: they die. When you die, trigger the Puppet's death ability. You also register as an Outsider and a Minion. [During setup, Minions become Shapeshifters, -1 Outsider]"
+    "otherNightReminder": "Each night*, the Shapeshifters must jointly choose a player: they die. When you die, trigger the Puppet's death ability."
   },
   {
     "id": "25_siege",
