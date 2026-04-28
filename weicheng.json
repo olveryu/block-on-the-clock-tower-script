@@ -28,7 +28,7 @@
     "name": "瞭望兵",
     "team": "townsfolk",
     "ability": "每个夜晚，你会得知一个不在场上的爪牙或外来者角色。",
-    "firstNight": 38,
+    "firstNight": 44,
     "otherNight": 17
   },
   {
@@ -40,7 +40,7 @@
     "name": "牧师",
     "team": "townsfolk",
     "ability": "每个夜晚，你会得知有多少名存活玩家不再是最初的角色。",
-    "firstNight": 46,
+    "firstNight": 52,
     "otherNight": 23
   },
   {
@@ -51,7 +51,7 @@
     "name": "书记官",
     "team": "townsfolk",
     "ability": "在你的首个夜晚，你会得知所有外来者玩家的座位号之和。",
-    "firstNight": 42
+    "firstNight": 48
   },
   {
     "id": "4_weicheng",
@@ -64,7 +64,7 @@
     "name": "审讯官",
     "team": "townsfolk",
     "ability": "每个夜晚，你要选择三名存活的其他玩家：你会得知是否有恶魔外的邪恶玩家。",
-    "firstNight": 36,
+    "firstNight": 42,
     "otherNight": 16
   },
   {
@@ -78,7 +78,7 @@
     "name": "巡逻兵",
     "team": "townsfolk",
     "ability": "每个夜晚，选择一名玩家：你会得知与他邻座的两名存活玩家之中是否有外来者。",
-    "firstNight": 40,
+    "firstNight": 46,
     "otherNight": 20
   },
   {
@@ -131,7 +131,7 @@
     "name": "军医",
     "team": "townsfolk",
     "ability": "每个夜晚，选择一名玩家：如果他已死亡，你会得知他是否邪恶；如果他存活，你会得知他今晚是否被唤醒。",
-    "firstNight": 44,
+    "firstNight": 50,
     "otherNight": 22
   },
   {
@@ -141,7 +141,7 @@
     "name": "斥候",
     "team": "townsfolk",
     "ability": "在你的首个夜晚，你会得知两个恶魔角色，其中一个在游戏中。第三天开始，在白天时，你可以私下询问说书人：得知恶魔角色。",
-    "firstNight": 33
+    "firstNight": 40
   },
   {
     "id": "15_weicheng",
@@ -211,7 +211,7 @@
     "name": "内应",
     "team": "minion",
     "ability": "在你的首个夜晚，你要选择一名存活玩家：在明天白天开始时，你们变成傀儡。",
-    "firstNight": 19
+    "firstNight": 32
   },
   {
     "id": "19_weicheng",
@@ -224,7 +224,7 @@
     "name": "蛊惑者",
     "team": "minion",
     "ability": "每个夜晚，你要选择一名与你邻座的存活玩家：他在当晚和明天白天变成傀儡。",
-    "firstNight": 25,
+    "firstNight": 36,
     "otherNight": 2
   },
   {
@@ -261,7 +261,7 @@
     "name": "攻城将军",
     "team": "demon",
     "ability": "每个夜晚，你会看到魔典。每个夜晚*，你要选择一名玩家：他死亡。",
-    "firstNight": 17,
+    "firstNight": 30,
     "otherNight": 6
   },
   {
@@ -303,7 +303,7 @@
     "name": "暗箭手",
     "team": "demon",
     "ability": "在你的首个夜晚，你要选择一名玩家：他变成傀儡。每个夜晚*，你要选择一名玩家：他死亡，如果你杀死的是你首个夜晚选择的玩家，你可以和一名邪恶玩家交换角色。",
-    "firstNight": 22,
+    "firstNight": 34,
     "otherNight": 7
   }
 ]

@@ -28,7 +28,7 @@
     "name": "Lookout",
     "team": "townsfolk",
     "ability": "Each night, you learn 1 Minion or Outsider character that is not in play.",
-    "firstNight": 38,
+    "firstNight": 44,
     "otherNight": 17
   },
   {
@@ -40,7 +40,7 @@
     "name": "Chaplain",
     "team": "townsfolk",
     "ability": "Each night, you learn how many alive players are no longer their original character.",
-    "firstNight": 46,
+    "firstNight": 52,
     "otherNight": 23
   },
   {
@@ -51,7 +51,7 @@
     "name": "Scribe",
     "team": "townsfolk",
     "ability": "On your first night, you learn the sum of all Outsider players' seat numbers.",
-    "firstNight": 42
+    "firstNight": 48
   },
   {
     "id": "4_siege",
@@ -64,7 +64,7 @@
     "name": "Inquisitor",
     "team": "townsfolk",
     "ability": "Each night, choose 3 other alive players: you learn if any is a non-Demon evil player.",
-    "firstNight": 36,
+    "firstNight": 42,
     "otherNight": 16
   },
   {
@@ -78,7 +78,7 @@
     "name": "Patrolman",
     "team": "townsfolk",
     "ability": "Each night, choose a player: you learn if either alive neighbour of that player is an Outsider.",
-    "firstNight": 40,
+    "firstNight": 46,
     "otherNight": 20
   },
   {
@@ -131,7 +131,7 @@
     "name": "Coroner",
     "team": "townsfolk",
     "ability": "Each night, choose a player: if they are dead, you learn if they are evil; if they are alive, you learn if they were woken tonight.",
-    "firstNight": 44,
+    "firstNight": 50,
     "otherNight": 22
   },
   {
@@ -141,7 +141,7 @@
     "name": "Scout",
     "team": "townsfolk",
     "ability": "On your first night, you learn 2 Demon characters; one is in play. From day 3, during the day, you may privately ask the Storyteller: learn the Demon character.",
-    "firstNight": 33
+    "firstNight": 40
   },
   {
     "id": "15_siege",
@@ -211,7 +211,7 @@
     "name": "Mole",
     "team": "minion",
     "ability": "On your first night, choose an alive player: at the start of tomorrow's day, you both become the Puppet.",
-    "firstNight": 19
+    "firstNight": 32
   },
   {
     "id": "19_siege",
@@ -224,7 +224,7 @@
     "name": "Hexer",
     "team": "minion",
     "ability": "Each night, choose an alive neighbour: they become the Puppet tonight and tomorrow's day.",
-    "firstNight": 25,
+    "firstNight": 36,
     "otherNight": 2
   },
   {
@@ -261,7 +261,7 @@
     "name": "Siege Lord",
     "team": "demon",
     "ability": "Each night, you see the Grimoire. Each night*, choose a player: they die.",
-    "firstNight": 17,
+    "firstNight": 30,
     "otherNight": 6
   },
   {
@@ -303,7 +303,7 @@
     "name": "Shadow Archer",
     "team": "demon",
     "ability": "On your first night, choose a player: they become the Puppet. Each night*, choose a player: they die. If you kill the player you chose on your first night, you may swap characters with an evil player.",
-    "firstNight": 22,
+    "firstNight": 34,
     "otherNight": 7
   }
 ]
