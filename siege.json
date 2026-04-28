@@ -70,14 +70,14 @@
   {
     "id": "3_siege",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/3_weicheng.png",
-    "firstNightReminder": "Each night, choose a player: you learn if either alive neighbour of that player is an Outsider.",
-    "otherNightReminder": "Each night, choose a player: you learn if either alive neighbour of that player is an Outsider.",
+    "firstNightReminder": "Each night, choose a player: you learn if either alive neighbor of that player is an Outsider.",
+    "otherNightReminder": "Each night, choose a player: you learn if either alive neighbor of that player is an Outsider.",
     "reminders": [
       "Patrol"
     ],
     "name": "Patrolman",
     "team": "townsfolk",
-    "ability": "Each night, choose a player: you learn if either alive neighbour of that player is an Outsider.",
+    "ability": "Each night, choose a player: you learn if either alive neighbor of that player is an Outsider.",
     "firstNight": 46,
     "otherNight": 20
   },
@@ -153,7 +153,7 @@
     "team": "outsider",
     "ability": "When you die, that night the Demon must choose an alive player: they become the Puppet.",
     "otherNight": 12,
-    "otherNightReminder": "When you die, that night the Demon must choose an alive player: they become the Puppet."
+    "otherNightReminder": "If the Wounded died tonight, the Demon must choose an alive player: they become the Puppet."
   },
   {
     "id": "13_siege",
@@ -165,7 +165,7 @@
     "team": "outsider",
     "ability": "When you die, that night the Demon must choose an alive player: they die tonight.",
     "otherNight": 10,
-    "otherNightReminder": "When you die, that night the Demon must choose an alive player: they die tonight."
+    "otherNightReminder": "If the Deserter died tonight, the Demon must choose an alive player: they die tonight."
   },
   {
     "id": "14_siege",
@@ -177,7 +177,7 @@
     "team": "outsider",
     "ability": "When you die, that night the Demon must choose a good dead player: they turn evil. (Once only)",
     "otherNight": 11,
-    "otherNightReminder": "When you die, that night the Demon must choose a good dead player: they turn evil. (Once only)"
+    "otherNightReminder": "If the Refugee died tonight and the Refugee effect has not triggered before, the Demon must choose a good dead player: they turn evil."
   },
   {
     "id": "16_siege",
@@ -189,7 +189,7 @@
     "team": "outsider",
     "ability": "When you die, that night the Demon must choose an evil player and a Minion character: they become that character and immediately use that ability.",
     "otherNight": 13,
-    "otherNightReminder": "When you die, that night the Demon must choose an evil player and a Minion character: they become that character and immediately use that ability."
+    "otherNightReminder": "If the Captive died tonight, the Demon must choose an evil player and a Minion character: they become that character and immediately use that ability."
   },
   {
     "id": "17_siege",
@@ -216,21 +216,21 @@
   {
     "id": "19_siege",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/19_weicheng.png",
-    "firstNightReminder": "Each night, choose an alive neighbour: they become the Puppet tonight and tomorrow's day.",
-    "otherNightReminder": "Each night, choose an alive neighbour: they become the Puppet tonight and tomorrow's day.",
+    "firstNightReminder": "Each night, choose an alive neighbor: they become the Puppet tonight and tomorrow day.",
+    "otherNightReminder": "Each night, choose an alive neighbor: they become the Puppet tonight and tomorrow day.",
     "reminders": [
       "Hexed"
     ],
     "name": "Hexer",
     "team": "minion",
-    "ability": "Each night, choose an alive neighbour: they become the Puppet tonight and tomorrow's day.",
+    "ability": "Each night, choose an alive neighbor: they become the Puppet tonight and tomorrow day.",
     "firstNight": 36,
     "otherNight": 2
   },
   {
     "id": "20_siege",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/20_weicheng.png",
-    "otherNightReminder": "Each night*, you may choose a Demon character: choose to make yourself or the Demon become that character; the other becomes the Puppet. [+1 Outsider]",
+    "otherNightReminder": "Each night*, you may choose a Demon character: choose to make yourself or the Demon become that character; the other becomes the Puppet.",
     "reminders": [
       "Transform"
     ],
@@ -253,7 +253,7 @@
   {
     "id": "24_siege",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/24_weicheng.png",
-    "firstNightReminder": "Each night, you see the Grimoire. Each night*, choose a player: they die.",
+    "firstNightReminder": "Each night, you see the Grimoire.",
     "otherNightReminder": "Each night, you see the Grimoire. Each night*, choose a player: they die.",
     "reminders": [
       "Dead"
@@ -293,8 +293,8 @@
   {
     "id": "25_siege",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/25_weicheng.png",
-    "firstNightReminder": "On your first night, choose a player: they become the Puppet. Each night*, choose a player: they die. If you kill the player you chose on your first night, you may swap characters with an evil player.",
-    "otherNightReminder": "On your first night, choose a player: they become the Puppet. Each night*, choose a player: they die. If you kill the player you chose on your first night, you may swap characters with an evil player.",
+    "firstNightReminder": "On your first night, choose a player: they become the Puppet.",
+    "otherNightReminder": "Each night*, choose a player: they die. If you kill the player you chose on your first night, you may swap characters with an evil player.",
     "reminders": [
       "Dead",
       "Puppet",
