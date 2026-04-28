@@ -46,11 +46,11 @@
   {
     "id": "7_weicheng",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/7_weicheng.png",
-    "firstNightReminder": "在你的首个夜晚，你会得知所有外来者玩家的座位号之和。",
+    "firstNightReminder": "在你的首个夜晚，你会得知所有外来者与所有爪牙的座位号总和。",
     "reminders": [],
     "name": "书记官",
     "team": "townsfolk",
-    "ability": "在你的首个夜晚，你会得知所有外来者玩家的座位号之和。",
+    "ability": "在你的首个夜晚，你会得知所有外来者与所有爪牙的座位号总和。",
     "firstNight": 48
   },
   {

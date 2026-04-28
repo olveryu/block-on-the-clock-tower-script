@@ -25,7 +25,7 @@ The Shieldbearer blocks night death chain effects (Outsiders still die, but effe
 - **Shapeshifter** — All Minions become Shapeshifters. Multiple Demons coordinate kills.
 
 🕵️ **Rich Information Roles**
-Inquisitor (detect evil), Herald/Patrolman (detect Outsiders), Coroner (autopsy), Chaplain (detect character changes), Scribe (Outsider seat sum), Scout (identify Demon type) — Good has many tools, but the Hexer can poison your information at any time.
+Inquisitor (detect evil), Herald/Patrolman (detect Outsiders), Coroner (autopsy), Chaplain (detect character changes), Scribe (Outsider+Minion seat sum), Scout (identify Demon type) — Good has many tools, but the Hexer can poison your information at any time.
 
 ---
 
@@ -42,7 +42,7 @@ Inquisitor (detect evil), Herald/Patrolman (detect Outsiders), Coroner (autopsy)
 | Chaplain | Each night, you learn how many alive players are no longer their original character. |
 | Shieldbearer | While you are alive, Outsiders do not trigger their death effects when dying at night. |
 | Baroness | While you are alive, executed players do not trigger Outsider death effects. |
-| Scribe | On your first night, you learn the sum of all Outsider players' seat numbers. |
+| Scribe | On your first night, you learn the sum of all Outsider & all Minion players' seats. |
 | Herald | Each day, you may privately visit the Storyteller and name 3 players: you learn if exactly one of them is an Outsider. |
 | Ranger | If you die at night, choose an alive player: if they are a non-Demon evil player, they lose their ability and die. |
 | Inquisitor | Each night, choose 3 other alive players: you learn if any is a non-Demon evil player. |

@@ -46,11 +46,11 @@
   {
     "id": "7_siege",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/7_weicheng.png",
-    "firstNightReminder": "On your first night, you learn the sum of all Outsider players' seat numbers.",
+    "firstNightReminder": "On your first night, you learn the sum of all Outsider & all Minion players' seats.",
     "reminders": [],
     "name": "Scribe",
     "team": "townsfolk",
-    "ability": "On your first night, you learn the sum of all Outsider players' seat numbers.",
+    "ability": "On your first night, you learn the sum of all Outsider & all Minion players' seats.",
     "firstNight": 48
   },
   {
