@@ -251,28 +251,28 @@
   {
     "id": "24_siege",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/24_weicheng.png",
-    "firstNightReminder": "On your first night, you learn all players' characters. Each night*, choose a player: they die.",
-    "otherNightReminder": "On your first night, you learn all players' characters. Each night*, choose a player: they die.",
+    "firstNightReminder": "Each night, you see the Grimoire. Each night*, choose a player: they die.",
+    "otherNightReminder": "Each night, you see the Grimoire. Each night*, choose a player: they die.",
     "reminders": [
       "Dead"
     ],
     "name": "Siege Lord",
     "team": "demon",
-    "ability": "On your first night, you learn all players' characters. Each night*, choose a player: they die.",
+    "ability": "Each night, you see the Grimoire. Each night*, choose a player: they die.",
     "firstNight": 9,
     "otherNight": 6
   },
   {
     "id": "22_siege",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/22_weicheng.png",
-    "otherNightReminder": "Each night*, choose a player: they die. If they are an Outsider, choose another alive player: they become the Puppet.",
+    "otherNightReminder": "Each night*, choose a player: they die.",
     "reminders": [
-      "Dead",
-      "Petrified"
+      "Dead"
     ],
+    "setup": true,
     "name": "Vanguard",
     "team": "demon",
-    "ability": "Each night*, choose a player: they die. If they are an Outsider, choose another alive player: they become the Puppet.",
+    "ability": "Each night*, choose a player: they die. Outsiders also register as the Puppet. [+1 Outsider]",
     "otherNight": 8
   },
   {
