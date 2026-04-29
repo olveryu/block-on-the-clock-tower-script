@@ -95,14 +95,14 @@
   {
     "id": "5_siege",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/5_weicheng.png",
-    "otherNightReminder": "If you die at night, choose an alive player: if they are a non-Demon evil player, they lose their ability and die.",
+    "otherNightReminder": "If you die at night, choose an alive player: if they are a non-Demon evil player, they lose their ability & die.",
     "reminders": [
       "Vengeance",
       "Ability lost, dead"
     ],
     "name": "Ranger",
     "team": "townsfolk",
-    "ability": "If you die at night, choose an alive player: if they are a non-Demon evil player, they lose their ability and die.",
+    "ability": "If you die at night, choose an alive player: if they are a non-Demon evil player, they lose their ability & die.",
     "otherNight": 21
   },
   {
@@ -110,14 +110,14 @@
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/10_weicheng.png",
     "name": "Herald",
     "team": "townsfolk",
-    "ability": "Each day, you may privately visit the Storyteller and name 3 players: you learn if exactly one of them is an Outsider."
+    "ability": "Each day, you may privately visit the Storyteller & name 3 players: you learn if exactly one of them is an Outsider."
   },
   {
     "id": "2_siege",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/2_weicheng.png",
     "name": "Spy Hunter",
     "team": "townsfolk",
-    "ability": "Each day, you may privately visit the Storyteller and name 2 players: the Storyteller tells you which is closer to a Minion."
+    "ability": "Each day, you may privately visit the Storyteller & name 2 players: the Storyteller tells you which is closer to a Minion."
   },
   {
     "id": "6_siege",
@@ -183,13 +183,13 @@
     "id": "16_siege",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/16_weicheng.png",
     "remindersGlobal": [
-      "Replaced"
+      "Mad"
     ],
     "name": "Captive",
     "team": "outsider",
-    "ability": "When you die, that night the Demon must choose an evil player and a Minion character: they become that character and immediately use that ability.",
+    "ability": "When you die, that night the Demon must choose an alive player & a good character (not in play): they are \"mad\" they are this character, or might be executed.",
     "otherNight": 13,
-    "otherNightReminder": "If the Captive died tonight, the Demon must choose an evil player and a Minion character: they become that character and immediately use that ability."
+    "otherNightReminder": "If the Captive died tonight, the Demon must choose an alive player & a good character (not in play): they are \"mad\" they are this character, or might be executed."
   },
   {
     "id": "17_siege",
@@ -248,7 +248,7 @@
     ],
     "name": "Undead",
     "team": "minion",
-    "ability": "You think you are an Outsider character, but you are not. You also register as an Outsider. If the Demon dies, you become that Demon. When you die, trigger a Puppet's death ability. The Demon and Minions know you are the Undead."
+    "ability": "You think you are an Outsider character, but you are not. You also register as an Outsider. If the Demon dies, you become that Demon. When you die, trigger a Puppet's death ability. The Demon & Minions know you are the Undead."
   },
   {
     "id": "24_siege",
@@ -286,7 +286,7 @@
     "setup": true,
     "name": "Shapeshifter",
     "team": "demon",
-    "ability": "Each night*, the Shapeshifters must jointly choose a player: they die. When you die, trigger a Puppet's death ability. You also register as an Outsider and a Minion. [During setup, Minions become Shapeshifters]",
+    "ability": "Each night*, the Shapeshifters must jointly choose a player: they die. When you die, trigger a Puppet's death ability. You also register as an Outsider & a Minion. [During setup, Minions become Shapeshifters]",
     "otherNight": 9,
     "otherNightReminder": "Each night*, the Shapeshifters must jointly choose a player: they die. When you die, trigger a Puppet's death ability."
   },

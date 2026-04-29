@@ -36,15 +36,15 @@ Inquisitor (detect evil), Herald/Patrolman (detect Outsiders), Coroner (autopsy)
 | Character | Ability |
 |-----------|---------|
 | Lookout | Each night, you learn 1 Minion or Outsider character that is not in play. |
-| Spy Hunter | Each day, you may privately visit the Storyteller and name 2 players: the Storyteller tells you which is closer to a Minion. |
+| Spy Hunter | Each day, you may privately visit the Storyteller & name 2 players: the Storyteller tells you which is closer to a Minion. |
 | Coroner | Each night, choose a player: if they are dead, you learn if they are evil; if they are alive, you learn if they were woken tonight. |
 | Quartermaster | Each day, you may publicly choose a player: if they are a Minion or Outsider, they are drunk until next dawn. |
 | Chaplain | Each night, you learn how many alive players are no longer their original character. |
 | Shieldbearer | While you are alive, Outsiders do not trigger their death effects when dying at night. |
 | Baroness | While you are alive, executed players do not trigger Outsider death effects. |
 | Scribe | On your first night, you learn the sum of all Outsider & all Minion players' seats. |
-| Herald | Each day, you may privately visit the Storyteller and name 3 players: you learn if exactly one of them is an Outsider. |
-| Ranger | If you die at night, choose an alive player: if they are a non-Demon evil player, they lose their ability and die. |
+| Herald | Each day, you may privately visit the Storyteller & name 3 players: you learn if exactly one of them is an Outsider. |
+| Ranger | If you die at night, choose an alive player: if they are a non-Demon evil player, they lose their ability & die. |
 | Inquisitor | Each night, choose 3 other alive players: you learn if exactly one of them is a non-Demon evil player. |
 | Patrolman | Each night, choose a player: you learn if either alive neighbor of that player is an Outsider. |
 | Scout | On your first night, you learn 2 Demon characters; one is in play. From day 3, during the day, you may privately ask the Storyteller: learn the Demon character. |
@@ -56,7 +56,7 @@ Inquisitor (detect evil), Herald/Patrolman (detect Outsiders), Coroner (autopsy)
 | Deserter | When you die, that night the Demon must choose an alive player: they die tonight. |
 | Refugee | When you die, that night the Demon must choose a good dead player: they turn evil. (Once only) |
 | Wounded | When you die, that night the Demon must choose an alive player: they become a Puppet. |
-| Captive | When you die, that night the Demon must choose an evil player and a Minion character: they become that character and immediately use that ability. |
+| Captive | When you die, that night the Demon must choose an alive player & a good character (not in play): they are "mad" they are this character, or might be executed. |
 | Puppet | You think you are a good character, but you are not. When you die, that night the Demon must choose an Outsider character (different to last time): trigger that Outsider's death ability. [Does not appear during setup] |
 
 ### Minions (4)
@@ -64,7 +64,7 @@ Inquisitor (detect evil), Herald/Patrolman (detect Outsiders), Coroner (autopsy)
 | Character | Ability |
 |-----------|---------|
 | Mole | On your first night, choose an alive player: at the start of tomorrow's day, you both become a Puppet. |
-| Undead | You think you are an Outsider character, but you are not. You also register as an Outsider. If the Demon dies, you become that Demon. When you die, trigger a Puppet's death ability. The Demon and Minions know you are the Undead. |
+| Undead | You think you are an Outsider character, but you are not. You also register as an Outsider. If the Demon dies, you become that Demon. When you die, trigger a Puppet's death ability. The Demon & Minions know you are the Undead. |
 | Turncoat | Each night*, you may choose a Demon character: choose to make yourself or the Demon become that character; the other becomes a Puppet. [+1 Outsider] |
 | Hexer | Each night, choose an alive neighbor: they become a Puppet tonight and tomorrow day. |
 
@@ -75,7 +75,7 @@ Inquisitor (detect evil), Herald/Patrolman (detect Outsiders), Coroner (autopsy)
 | Siege Lord | Each night, you see the Grimoire. Each night*, choose a player: they die. |
 | Shadow Archer | On your first night, choose a player: they become a Puppet. Each night*, choose a player: they die. If you kill the player you chose on your first night, you may swap characters with an evil player. |
 | Vanguard | Each night*, choose a player: they die. Outsiders also register as a Puppet. [+1 Outsider] |
-| Shapeshifter | Each night*, the Shapeshifters must jointly choose a player: they die. When you die, trigger a Puppet's death ability. You also register as an Outsider and a Minion. [During setup, Minions become Shapeshifters] |
+| Shapeshifter | Each night*, the Shapeshifters must jointly choose a player: they die. When you die, trigger a Puppet's death ability. You also register as an Outsider & a Minion. [During setup, Minions become Shapeshifters] |
 
 ---
 

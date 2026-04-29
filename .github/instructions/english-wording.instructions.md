@@ -16,3 +16,26 @@ description: "Use when writing or editing English ability text for 围城之夜 
 - ✅ "trigger a Puppet's death ability"
 - ❌ "they become the Puppet"
 - ❌ "trigger the Puppet's death ability"
+
+## 用 "&" 而非 "and" 连接能力文本中的并列项
+
+官方 BotC 角色能力文本中，并列动作/对象用 **"&"** 而不是 "and"。例如：
+
+- Fang Gu: "becomes an evil Fang Gu **&** you die instead"
+- Savant: "1 is true **&** 1 is false"
+
+### 正确示例
+
+- ✅ "they lose their ability & die"
+- ✅ "choose an evil player & an alive player"
+- ✅ "turns evil & becomes that character"
+- ✅ "an Outsider & a Minion"
+- ❌ "they lose their ability and die"
+- ❌ "choose an evil player and an alive player"
+
+## 限制性条件用括号 "(different to last ___)"
+
+官方 Exorcist / Devil's Advocate 用 `(different to last night)` 格式。围城之夜 Puppet 用 `(different to last time)`。
+
+- ✅ "(different to last time)"
+- ❌ "(not the same as last time)"

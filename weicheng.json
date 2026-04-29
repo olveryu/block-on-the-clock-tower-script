@@ -183,13 +183,13 @@
     "id": "16_weicheng",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/16_weicheng.png",
     "remindersGlobal": [
-      "替换"
+      "疑似"
     ],
     "name": "俘虏",
     "team": "outsider",
-    "ability": "当你死亡，当晚恶魔要选择一名邪恶玩家和爪牙角色：他变成该角色并立即使用该能力。",
+    "ability": "当你死亡，当晚恶魔要选择一名存活玩家和一个不在场的善良角色：该玩家必须“疑似”地声称自己是该角色，否则可能被处决。",
     "otherNight": 13,
-    "otherNightReminder": "如果俘虏今晚死亡，恶魔要选择一名邪恶玩家和爪牙角色：他变成该角色并立即使用该能力。"
+    "otherNightReminder": "如果俘虏今晚死亡，恶魔要选择一名存活玩家和一个不在场的善良角色：该玩家必须“疑似”地声称自己是该角色，否则可能被处决。"
   },
   {
     "id": "17_weicheng",
