@@ -55,27 +55,27 @@ Inquisitor (detect evil), Herald/Patrolman (detect Outsiders), Coroner (autopsy)
 |-----------|-------------|
 | Deserter | When you die, that night the Demon must choose an alive player: they die tonight. |
 | Refugee | When you die, that night the Demon must choose a good dead player: they turn evil. (Once only) |
-| Wounded | When you die, that night the Demon must choose an alive player: they become the Puppet. |
+| Wounded | When you die, that night the Demon must choose an alive player: they become a Puppet. |
 | Captive | When you die, that night the Demon must choose an evil player and a Minion character: they become that character and immediately use that ability. |
-| Puppet | You think you are a good character, but you are not. When you die, that night the Demon must choose an Outsider character: trigger that Outsider's death ability. [Does not appear during setup] |
+| Puppet | You think you are a good character, but you are not. When you die, that night the Demon must choose an Outsider character (different to last time): trigger that Outsider's death ability. [Does not appear during setup] |
 
 ### Minions (4)
 
 | Character | Ability |
 |-----------|---------|
-| Mole | On your first night, choose an alive player: at the start of tomorrow's day, you both become the Puppet. |
-| Undead | You think you are an Outsider character, but you are not. You also register as an Outsider. If the Demon dies, you become that Demon. When you die, trigger the Puppet's death ability. The Demon and Minions know you are the Undead. |
-| Turncoat | Each night*, you may choose a Demon character: choose to make yourself or the Demon become that character; the other becomes the Puppet. [+1 Outsider] |
-| Hexer | Each night, choose an alive neighbor: they become the Puppet tonight and tomorrow day. |
+| Mole | On your first night, choose an alive player: at the start of tomorrow's day, you both become a Puppet. |
+| Undead | You think you are an Outsider character, but you are not. You also register as an Outsider. If the Demon dies, you become that Demon. When you die, trigger a Puppet's death ability. The Demon and Minions know you are the Undead. |
+| Turncoat | Each night*, you may choose a Demon character: choose to make yourself or the Demon become that character; the other becomes a Puppet. [+1 Outsider] |
+| Hexer | Each night, choose an alive neighbor: they become a Puppet tonight and tomorrow day. |
 
 ### Demons (4)
 
 | Character | Ability |
 |-----------|---------|
 | Siege Lord | Each night, you see the Grimoire. Each night*, choose a player: they die. |
-| Shadow Archer | On your first night, choose a player: they become the Puppet. Each night*, choose a player: they die. If you kill the player you chose on your first night, you may swap characters with an evil player. |
-| Vanguard | Each night*, choose a player: they die. Outsiders also register as the Puppet. [+1 Outsider] |
-| Shapeshifter | Each night*, the Shapeshifters must jointly choose a player: they die. When you die, trigger the Puppet's death ability. You also register as an Outsider and a Minion. [During setup, Minions become Shapeshifters] |
+| Shadow Archer | On your first night, choose a player: they become a Puppet. Each night*, choose a player: they die. If you kill the player you chose on your first night, you may swap characters with an evil player. |
+| Vanguard | Each night*, choose a player: they die. Outsiders also register as a Puppet. [+1 Outsider] |
+| Shapeshifter | Each night*, the Shapeshifters must jointly choose a player: they die. When you die, trigger a Puppet's death ability. You also register as an Outsider and a Minion. [During setup, Minions become Shapeshifters] |
 
 ---
 

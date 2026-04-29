@@ -151,9 +151,9 @@
     ],
     "name": "Wounded",
     "team": "outsider",
-    "ability": "When you die, that night the Demon must choose an alive player: they become the Puppet.",
+    "ability": "When you die, that night the Demon must choose an alive player: they become a Puppet.",
     "otherNight": 12,
-    "otherNightReminder": "If the Wounded died tonight, the Demon must choose an alive player: they become the Puppet."
+    "otherNightReminder": "If the Wounded died tonight, the Demon must choose an alive player: they become a Puppet."
   },
   {
     "id": "13_siege",
@@ -197,47 +197,47 @@
     "setup": true,
     "name": "Puppet",
     "team": "outsider",
-    "ability": "You think you are a good character, but you are not. When you die, that night the Demon must choose an Outsider character: trigger that Outsider's death ability. [Does not appear during setup]",
+    "ability": "You think you are a good character, but you are not. When you die, that night the Demon must choose an Outsider character (different to last time): trigger that Outsider's death ability. [Does not appear during setup]",
     "otherNight": 14,
-    "otherNightReminder": "If the Puppet died tonight, the Demon must choose an Outsider character: trigger that Outsider's death ability."
+    "otherNightReminder": "If a Puppet died tonight, the Demon must choose an Outsider character (different to last time): trigger that Outsider's death ability."
   },
   {
     "id": "18_siege",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/18_weicheng.png",
-    "firstNightReminder": "On your first night, choose an alive player: at the start of tomorrow's day, you both become the Puppet.",
+    "firstNightReminder": "On your first night, choose an alive player: at the start of tomorrow's day, you both become a Puppet.",
     "reminders": [
       "Turned"
     ],
     "name": "Mole",
     "team": "minion",
-    "ability": "On your first night, choose an alive player: at the start of tomorrow's day, you both become the Puppet.",
+    "ability": "On your first night, choose an alive player: at the start of tomorrow's day, you both become a Puppet.",
     "firstNight": 32
   },
   {
     "id": "19_siege",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/19_weicheng.png",
-    "firstNightReminder": "Each night, choose an alive neighbor: they become the Puppet tonight and tomorrow day.",
-    "otherNightReminder": "Each night, choose an alive neighbor: they become the Puppet tonight and tomorrow day.",
+    "firstNightReminder": "Each night, choose an alive neighbor: they become a Puppet tonight and tomorrow day.",
+    "otherNightReminder": "Each night, choose an alive neighbor: they become a Puppet tonight and tomorrow day.",
     "reminders": [
       "Hexed"
     ],
     "name": "Hexer",
     "team": "minion",
-    "ability": "Each night, choose an alive neighbor: they become the Puppet tonight and tomorrow day.",
+    "ability": "Each night, choose an alive neighbor: they become a Puppet tonight and tomorrow day.",
     "firstNight": 36,
     "otherNight": 2
   },
   {
     "id": "20_siege",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/20_weicheng.png",
-    "otherNightReminder": "Each night*, you may choose a Demon character: choose to make yourself or the Demon become that character; the other becomes the Puppet.",
+    "otherNightReminder": "Each night*, you may choose a Demon character: choose to make yourself or the Demon become that character; the other becomes a Puppet.",
     "reminders": [
       "Transform"
     ],
     "setup": true,
     "name": "Turncoat",
     "team": "minion",
-    "ability": "Each night*, you may choose a Demon character: choose to make yourself or the Demon become that character; the other becomes the Puppet. [+1 Outsider]",
+    "ability": "Each night*, you may choose a Demon character: choose to make yourself or the Demon become that character; the other becomes a Puppet. [+1 Outsider]",
     "otherNight": 3
   },
   {
@@ -248,7 +248,7 @@
     ],
     "name": "Undead",
     "team": "minion",
-    "ability": "You think you are an Outsider character, but you are not. You also register as an Outsider. If the Demon dies, you become that Demon. When you die, trigger the Puppet's death ability. The Demon and Minions know you are the Undead."
+    "ability": "You think you are an Outsider character, but you are not. You also register as an Outsider. If the Demon dies, you become that Demon. When you die, trigger a Puppet's death ability. The Demon and Minions know you are the Undead."
   },
   {
     "id": "24_siege",
@@ -274,7 +274,7 @@
     "setup": true,
     "name": "Vanguard",
     "team": "demon",
-    "ability": "Each night*, choose a player: they die. Outsiders also register as the Puppet. [+1 Outsider]",
+    "ability": "Each night*, choose a player: they die. Outsiders also register as a Puppet. [+1 Outsider]",
     "otherNight": 8
   },
   {
@@ -286,14 +286,14 @@
     "setup": true,
     "name": "Shapeshifter",
     "team": "demon",
-    "ability": "Each night*, the Shapeshifters must jointly choose a player: they die. When you die, trigger the Puppet's death ability. You also register as an Outsider and a Minion. [During setup, Minions become Shapeshifters]",
+    "ability": "Each night*, the Shapeshifters must jointly choose a player: they die. When you die, trigger a Puppet's death ability. You also register as an Outsider and a Minion. [During setup, Minions become Shapeshifters]",
     "otherNight": 9,
-    "otherNightReminder": "Each night*, the Shapeshifters must jointly choose a player: they die. When you die, trigger the Puppet's death ability."
+    "otherNightReminder": "Each night*, the Shapeshifters must jointly choose a player: they die. When you die, trigger a Puppet's death ability."
   },
   {
     "id": "25_siege",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/25_weicheng.png",
-    "firstNightReminder": "On your first night, choose a player: they become the Puppet.",
+    "firstNightReminder": "On your first night, choose a player: they become a Puppet.",
     "otherNightReminder": "Each night*, choose a player: they die. If you kill the player you chose on your first night, you may swap characters with an evil player.",
     "reminders": [
       "Dead",
@@ -302,7 +302,7 @@
     ],
     "name": "Shadow Archer",
     "team": "demon",
-    "ability": "On your first night, choose a player: they become the Puppet. Each night*, choose a player: they die. If you kill the player you chose on your first night, you may swap characters with an evil player.",
+    "ability": "On your first night, choose a player: they become a Puppet. Each night*, choose a player: they die. If you kill the player you chose on your first night, you may swap characters with an evil player.",
     "firstNight": 34,
     "otherNight": 7
   }

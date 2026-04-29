@@ -5,19 +5,19 @@
     "逃兵"
   ],
   "townsfolk": [
-    "女伯爵",
     "盾卫",
-    "牧师",
-    "斥候",
-    "军需官",
+    "巡逻兵",
+    "瞭望兵",
     "审讯官",
+    "女伯爵",
+    "纹章官",
     "军医",
-    "纹章官"
+    "书记官"
   ],
   "bluffs": [
     "密探",
-    "游侠",
-    "巡逻兵"
+    "斥候",
+    "游侠"
   ],
   "not_in_play_outsiders": [
     "伤兵",
@@ -34,70 +34,10 @@
     "1": {
       "seat": 1,
       "name": "阿信",
-      "role": "千面人",
-      "original_role": "千面人",
-      "team": "邪恶",
-      "alive": false,
-      "is_drunk": false,
-      "is_hexed": false,
-      "register_outsider": true,
-      "register_minion": true,
-      "bluff_role": "游侠",
-      "claimed_role": "游侠",
-      "puppet": false
-    },
-    "2": {
-      "seat": 2,
-      "name": "小白",
-      "role": "军医",
-      "original_role": "军医",
-      "team": "镇民",
-      "alive": false,
-      "is_drunk": false,
-      "is_hexed": false,
-      "register_outsider": false,
-      "register_minion": false,
-      "bluff_role": null,
-      "claimed_role": "军医",
-      "puppet": false
-    },
-    "3": {
-      "seat": 3,
-      "name": "二哥",
-      "role": "女伯爵",
-      "original_role": "女伯爵",
-      "team": "镇民",
-      "alive": false,
-      "is_drunk": false,
-      "is_hexed": false,
-      "register_outsider": false,
-      "register_minion": false,
-      "bluff_role": null,
-      "claimed_role": "女伯爵",
-      "puppet": false
-    },
-    "4": {
-      "seat": 4,
-      "name": "月儿",
-      "role": "斥候",
-      "original_role": "斥候",
-      "team": "镇民",
-      "alive": true,
-      "is_drunk": false,
-      "is_hexed": false,
-      "register_outsider": false,
-      "register_minion": false,
-      "bluff_role": null,
-      "claimed_role": "斥候",
-      "puppet": false
-    },
-    "5": {
-      "seat": 5,
-      "name": "老王",
       "role": "审讯官",
       "original_role": "审讯官",
       "team": "镇民",
-      "alive": false,
+      "alive": true,
       "is_drunk": false,
       "is_hexed": false,
       "register_outsider": false,
@@ -106,24 +46,24 @@
       "claimed_role": "审讯官",
       "puppet": false
     },
-    "6": {
-      "seat": 6,
-      "name": "阿龙",
-      "role": "盾卫",
-      "original_role": "盾卫",
+    "2": {
+      "seat": 2,
+      "name": "小白",
+      "role": "书记官",
+      "original_role": "书记官",
       "team": "镇民",
-      "alive": true,
+      "alive": false,
       "is_drunk": false,
       "is_hexed": false,
       "register_outsider": false,
       "register_minion": false,
       "bluff_role": null,
-      "claimed_role": "盾卫",
+      "claimed_role": "书记官",
       "puppet": false
     },
-    "7": {
-      "seat": 7,
-      "name": "莉莉",
+    "3": {
+      "seat": 3,
+      "name": "二哥",
       "role": "千面人",
       "original_role": "千面人",
       "team": "邪恶",
@@ -136,9 +76,9 @@
       "claimed_role": "密探",
       "puppet": false
     },
-    "8": {
-      "seat": 8,
-      "name": "小七",
+    "4": {
+      "seat": 4,
+      "name": "月儿",
       "role": "纹章官",
       "original_role": "纹章官",
       "team": "镇民",
@@ -151,9 +91,54 @@
       "claimed_role": "纹章官",
       "puppet": false
     },
-    "9": {
-      "seat": 9,
-      "name": "大刘",
+    "5": {
+      "seat": 5,
+      "name": "老王",
+      "role": "傀儡",
+      "original_role": "军医",
+      "team": "镇民",
+      "alive": true,
+      "is_drunk": false,
+      "is_hexed": false,
+      "register_outsider": true,
+      "register_minion": false,
+      "bluff_role": null,
+      "claimed_role": "军医",
+      "puppet": true
+    },
+    "6": {
+      "seat": 6,
+      "name": "阿龙",
+      "role": "巡逻兵",
+      "original_role": "巡逻兵",
+      "team": "镇民",
+      "alive": false,
+      "is_drunk": false,
+      "is_hexed": false,
+      "register_outsider": false,
+      "register_minion": false,
+      "bluff_role": null,
+      "claimed_role": "巡逻兵",
+      "puppet": false
+    },
+    "7": {
+      "seat": 7,
+      "name": "莉莉",
+      "role": "女伯爵",
+      "original_role": "女伯爵",
+      "team": "镇民",
+      "alive": false,
+      "is_drunk": false,
+      "is_hexed": false,
+      "register_outsider": false,
+      "register_minion": false,
+      "bluff_role": null,
+      "claimed_role": "女伯爵",
+      "puppet": false
+    },
+    "8": {
+      "seat": 8,
+      "name": "小七",
       "role": "千面人",
       "original_role": "千面人",
       "team": "邪恶",
@@ -162,30 +147,45 @@
       "is_hexed": false,
       "register_outsider": true,
       "register_minion": true,
-      "bluff_role": "巡逻兵",
-      "claimed_role": "巡逻兵",
+      "bluff_role": "游侠",
+      "claimed_role": "游侠",
+      "puppet": false
+    },
+    "9": {
+      "seat": 9,
+      "name": "大刘",
+      "role": "瞭望兵",
+      "original_role": "瞭望兵",
+      "team": "镇民",
+      "alive": true,
+      "is_drunk": false,
+      "is_hexed": false,
+      "register_outsider": false,
+      "register_minion": false,
+      "bluff_role": null,
+      "claimed_role": "瞭望兵",
       "puppet": false
     },
     "10": {
       "seat": 10,
       "name": "苗苗",
-      "role": "军需官",
-      "original_role": "军需官",
-      "team": "镇民",
-      "alive": true,
+      "role": "千面人",
+      "original_role": "千面人",
+      "team": "邪恶",
+      "alive": false,
       "is_drunk": false,
       "is_hexed": false,
-      "register_outsider": false,
-      "register_minion": false,
-      "bluff_role": null,
-      "claimed_role": "军需官",
+      "register_outsider": true,
+      "register_minion": true,
+      "bluff_role": "斥候",
+      "claimed_role": "斥候",
       "puppet": false
     },
     "11": {
       "seat": 11,
       "name": "阿强",
-      "role": "牧师",
-      "original_role": "牧师",
+      "role": "盾卫",
+      "original_role": "盾卫",
       "team": "镇民",
       "alive": true,
       "is_drunk": false,
@@ -193,7 +193,7 @@
       "register_outsider": false,
       "register_minion": false,
       "bluff_role": null,
-      "claimed_role": "牧师",
+      "claimed_role": "盾卫",
       "puppet": false
     },
     "12": {
@@ -202,7 +202,7 @@
       "role": "逃兵",
       "original_role": "逃兵",
       "team": "外来者",
-      "alive": false,
+      "alive": true,
       "is_drunk": false,
       "is_hexed": false,
       "register_outsider": true,
@@ -213,14 +213,14 @@
     }
   },
   "evil_seats": [
-    1,
-    7,
-    9
+    3,
+    8,
+    10
   ],
   "demon_seats": [
-    1,
-    7,
-    9
+    3,
+    8,
+    10
   ],
   "minion_seats": [],
   "has_baron": false,
@@ -236,61 +236,45 @@
   "deaths": [
     [
       "D1",
-      7,
+      3,
       "千面人"
-    ],
-    [
-      "N1",
-      12,
-      "逃兵"
     ],
     [
       "N2",
       2,
-      "军医"
+      "书记官"
     ],
     [
       "D2",
-      9,
+      8,
       "千面人"
     ],
     [
       "N2",
-      5,
-      "审讯官"
+      6,
+      "巡逻兵"
     ],
     [
       "N3",
-      3,
+      7,
       "女伯爵"
     ],
     [
       "D3",
-      1,
+      10,
       "千面人"
     ]
   ],
   "events": [
     {
-      "source": 4,
-      "role": "斥候",
-      "day": 1,
-      "declared": [
-        "千面人",
-        "攻城将军"
-      ],
-      "distorted": false,
-      "bluff": false
-    },
-    {
-      "source": 5,
+      "source": 1,
       "role": "审讯官",
       "day": 1,
       "declared": {
         "targets": [
-          2,
-          6,
-          12
+          3,
+          5,
+          8
         ],
         "yes": false
       },
@@ -299,35 +283,82 @@
     },
     {
       "source": 2,
+      "role": "书记官",
+      "day": 1,
+      "declared": 33,
+      "distorted": false,
+      "bluff": false
+    },
+    {
+      "source": 9,
+      "role": "瞭望兵",
+      "day": 1,
+      "declared": "蛊惑者",
+      "distorted": false,
+      "bluff": false
+    },
+    {
+      "source": 5,
       "role": "军医",
       "day": 1,
       "declared": {
-        "target": 7,
+        "target": 3,
         "yes": true
       },
       "distorted": false,
       "bluff": false
     },
     {
-      "source": 9,
+      "source": 6,
       "role": "巡逻兵",
       "day": 1,
       "declared": {
-        "target": 6,
+        "target": 4,
         "yes": true
       },
+      "distorted": false,
+      "bluff": false
+    },
+    {
+      "source": 10,
+      "role": "斥候",
+      "day": 1,
+      "declared": [
+        "千面人",
+        "攻城将军"
+      ],
       "distorted": false,
       "bluff": true
     },
     {
-      "source": 5,
+      "source": 6,
+      "role": "巡逻兵",
+      "day": 2,
+      "declared": {
+        "target": 7,
+        "yes": true,
+        "day": 2
+      },
+      "distorted": false,
+      "bluff": false
+    },
+    {
+      "source": 9,
+      "role": "瞭望兵",
+      "day": 2,
+      "declared": "内应",
+      "distorted": false,
+      "bluff": false
+    },
+    {
+      "source": 1,
       "role": "审讯官",
       "day": 2,
       "declared": {
         "targets": [
-          3,
-          8,
-          11
+          4,
+          7,
+          10
         ],
         "yes": false,
         "day": 2
@@ -336,14 +367,15 @@
       "bluff": false
     },
     {
-      "source": 11,
-      "role": "牧师",
+      "source": 5,
+      "role": "军医",
       "day": 2,
       "declared": {
-        "changed": 0,
+        "target": 1,
+        "yes": true,
         "day": 2
       },
-      "distorted": false,
+      "distorted": true,
       "bluff": false
     }
   ],
