@@ -824,7 +824,7 @@ class Game:
         self.is_lunatic_setup = (demon == '千面人')
 
         if demon == '千面人':
-            outsider_count, townsfolk_count = 1, 8
+            outsider_count, townsfolk_count = 2, 7  # 剧本只'爪牙变千面人', 不改外来者
             minions_assignment = ['千面人', '千面人']
         elif demon == '先锋官' or '叛将' in minions_raw:
             outsider_count, townsfolk_count = 3, 6
@@ -1186,7 +1186,7 @@ class Game:
                     if self.verbose:
                         self.log(f'  {seat}({p.bluff_role},bluff): {ev.declared_result}', 1)
 
-    # ============= 杀人 (复用 v3) =============
+    # ============= 杀人 + 死亡链 (修复后含 trigger) =============
     def kill(self, seat, method='夜杀'):
         if not self.players[seat].alive: return False
         self.players[seat].alive = False
@@ -1195,6 +1195,7 @@ class Game:
         self.log(f'  → {time} 死亡: {seat} ({self.players[seat].name}, {self.players[seat].role})', 1)
         if self.players[seat].role == '女伯爵': self.has_save_baron = False
         if self.players[seat].role == '盾卫': self.has_save_shield = False
+        # 死士复活栈
         if is_demon_role(self.players[seat].role) and self.dead_man_active:
             if self.dead_man_seat and self.players[self.dead_man_seat].alive:
                 old = self.players[self.dead_man_seat].role
@@ -1204,7 +1205,106 @@ class Game:
                 self.demon_seats.append(self.dead_man_seat)
                 self.dead_man_active = False
                 self.log(f'  ★ 死士复活: {self.dead_man_seat} 从 {old} 变 {new}', 1)
+        # 触发死亡链 (修复 bug)
+        if self._should_trigger_death(seat, method):
+            self._trigger_death_chain(seat)
         return True
+
+    def _should_trigger_death(self, seat, method):
+        p = self.players[seat]
+        if method == '处决' and self.has_save_baron: return False
+        if method == '夜杀' and self.has_save_shield: return False
+        if p.role in OUTSIDER_POOL or p.role == '傀儡' or '千面人' in p.role or p.role == '死士':
+            return True
+        return False
+
+    def _trigger_death_chain(self, seat):
+        """外来者死亡只触发自己能力. 死士/傀儡/千面人 才触发傀儡能力 (各自 ability 明说)."""
+        role = self.players[seat].role
+        if role == '死士' or role == '傀儡' or '千面人' in role:
+            self._trigger_puppet_death()
+        elif role == '难民':
+            self._trigger_refugee()
+        elif role == '伤兵':
+            self._trigger_wounded()
+        elif role == '逃兵':
+            self._trigger_deserter()
+        elif role == '俘虏':
+            self._trigger_captive()
+        # 先锋官 setup: 外来者"被视为傀儡"只是 register, 不触发 (剧本没明说触发)
+
+    def _trigger_puppet_death(self):
+        """傀儡死亡链 — 剧本: '不能与上次相同'"""
+        valid = []
+        last = getattr(self, 'last_puppet_chain', None)
+        if not self.refugee_used and any(not self.players[s].alive and self.players[s].team != '邪恶'
+                                          and s not in self.evil_dead_votes for s in self.players):
+            if last != '难民':
+                valid.append(('难民', 0.4))
+        if [s for s in self.alive_seats() if s not in self.evil_seats]:
+            if last != '伤兵':
+                valid.append(('伤兵', 0.3))
+            if last != '逃兵':
+                valid.append(('逃兵', 0.4))
+        if self.evil_alive(exclude_demon=True) and last != '俘虏':
+            valid.append(('俘虏', 0.2))
+        if not valid: return
+        choices_v, weights = zip(*valid)
+        chosen = random.choices(choices_v, weights=weights)[0]
+        self.last_puppet_chain = chosen  # 记录避免下次重复
+        self.log(f'  傀儡死亡 → 邪恶选: {chosen} (上次={last})', 1)
+        if chosen == '难民': self._trigger_refugee()
+        elif chosen == '伤兵': self._trigger_wounded()
+        elif chosen == '逃兵': self._trigger_deserter()
+        elif chosen == '俘虏': self._trigger_captive()
+
+    def _trigger_refugee(self):
+        if self.refugee_used: return
+        good_dead = [s for s in self.players if not self.players[s].alive
+                      and self.players[s].team != '邪恶' and s not in self.evil_dead_votes]
+        if not good_dead: return
+        chosen = random.choice(good_dead)
+        self.evil_dead_votes.add(chosen)
+        self.refugee_used = True
+        self.log(f'  ★ 难民触发: {chosen} 变邪恶死人', 1)
+
+    def _trigger_wounded(self):
+        cands = [s for s in self.alive_seats() if s not in self.evil_seats]
+        if not cands: return
+        weights = [0.30 if self.players[s].role in ['军医', '盾卫', '审讯官']
+                   else 0.25 if self.players[s].role in ['女伯爵', '斥候']
+                   else 0.05 for s in cands]
+        chosen = random.choices(cands, weights=weights)[0]
+        old = self.players[chosen].role
+        self.players[chosen].role = '傀儡'
+        self.players[chosen].puppet = True
+        self.players[chosen].register_outsider = True
+        if old == '女伯爵': self.has_save_baron = False
+        if old == '盾卫': self.has_save_shield = False
+        self.log(f'  ★ 伤兵触发: {chosen} 从 {old} 变傀儡', 1)
+
+    def _trigger_deserter(self):
+        cands = [s for s in self.alive_seats() if s not in self.evil_seats]
+        if not cands: return
+        weights = [0.30 if self.players[s].role in ['军医', '审讯官', '斥候']
+                   else 0.05 if self.players[s].role == '游侠'
+                   else 0.10 for s in cands]
+        chosen = random.choices(cands, weights=weights)[0]
+        self.log(f'  ★ 逃兵触发: 选 {chosen} 当晚死', 1)
+        self.kill(chosen, method='夜杀')
+
+    def _trigger_captive(self):
+        """俘虏 (新规则): 邪恶选活人 + 不在场善良角色, 强制疯狂. 简化处理: 50% 玩家 violate → 死."""
+        cands = [s for s in self.alive_seats() if s not in self.evil_seats]
+        if not cands: return
+        chosen = random.choice(cands)
+        # 简化 madness: 50% violate, storyteller 处决
+        if random.random() < 0.5:
+            self.log(f'  ★ 俘虏触发: {chosen} 疯狂违反 → storyteller 处决', 1)
+            self.kill(chosen, method='处决')
+        else:
+            self.log(f'  ★ 俘虏触发: {chosen} 疯狂保持假声称 (信息流混乱)', 1)
+            self.players[chosen].puppet = True  # 信息源失能
 
     def n_kill(self):
         if self.day < 2: return

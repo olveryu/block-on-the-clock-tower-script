@@ -40,7 +40,7 @@ def setup(seed=None):
     minions_raw = random.sample(MINIONS, 2)
 
     if is_lunatic:
-        n_outsider, n_townsfolk = 1, 8
+        n_outsider, n_townsfolk = 2, 7  # 千面人剧本只'爪牙变千面人', 不改外来者数
         minions_assignment = ['千面人', '千面人']
     elif demon == '先锋官' or '叛将' in minions_raw:
         n_outsider, n_townsfolk = 3, 6
@@ -250,9 +250,7 @@ def kill_seat(s, seat, method):
             log.append(f"  → 触发外来者死亡链: {role} (需手动调 trigger)")
         elif role == '死士' or role == '傀儡' or '千面人' in role:
             log.append(f"  → 触发傀儡死亡能力 (需手动调 trigger_puppet)")
-        # 先锋官 setup: 外来者也触发傀儡
-        if s['demon_role'] == '先锋官' and role in OUTSIDERS:
-            log.append(f"  → 先锋官 setup 额外触发傀儡死亡")
+        # 先锋官 setup: 外来者"视为傀儡"只是 register, 不触发 (剧本没明说触发)
     else:
         log.append(f"  保险栓阻止触发")
 
@@ -300,18 +298,22 @@ def trigger_deserter(s, target):
     return kill_seat(s, target, '夜杀')
 
 
-def trigger_captive(s, target_seat, target_role):
-    """俘虏触发: target_seat 邪恶变 target_role"""
+def trigger_captive(s, target_seat, madness_role):
+    """俘虏触发 (剧本): 邪恶选活人 + 不在场善良角色, 该玩家"疯狂"声称是该角色, 否则 storyteller 可处决.
+    "疯狂" = BotC 标准 Madness 机制:
+      - 玩家被告知必须装该角色
+      - 必须公开/私下都坚持声称
+      - 如果违反, storyteller 可执行处决 (任意时候)
+    target_seat = 选的活人 (善良), madness_role = 不在场善良角色名.
+    """
     p = get_p(s, target_seat)
-    if p['team'] != '邪恶' or is_demon(p['role']):
+    if not p['alive'] or p['team'] == '邪恶':
         return f"无效目标 {target_seat}"
-    old = p['role']
-    p['role'] = target_role
-    if target_role == '死士':
-        s['dead_man_seat'] = target_seat
-        s['dead_man_active'] = True
+    p['madness_role'] = madness_role
+    p['madness_violated'] = False  # storyteller 跟踪是否违反
     save(s)
-    return f"俘虏触发: {target_seat} ({p['name']}) 从 {old} 变 {target_role}"
+    return (f"俘虏触发: {target_seat} ({p['name']}) 被强制'疯狂'装 {madness_role}, "
+            f"否则 storyteller 可处决")
 
 
 def trigger_puppet(s, outsider_choice, target=None):
