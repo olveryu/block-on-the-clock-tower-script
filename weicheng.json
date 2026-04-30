@@ -11,14 +11,14 @@
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/11_weicheng.png",
     "name": "盾卫",
     "team": "townsfolk",
-    "ability": "当你存活时，外来者在夜晚死亡时，不会触发死亡效果。"
+    "ability": "当一名外来者在夜晚死亡时，你变成傀儡——该外来者的死亡效果不触发。"
   },
   {
     "id": "12_weicheng",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/12_weicheng.png",
     "name": "女伯爵",
     "team": "townsfolk",
-    "ability": "当你存活时，被处决的玩家不会触发外来者的死亡效果。"
+    "ability": "当一名外来者被处决时，你变成傀儡——该外来者的死亡效果不触发。"
   },
   {
     "id": "_weicheng",
@@ -137,10 +137,10 @@
   {
     "id": "1_weicheng",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/1_weicheng.png",
-    "firstNightReminder": "在你的首个夜晚，你会得知两个恶魔角色，其中一个在游戏中。",
+    "firstNightReminder": "在你的首个夜晚，你会得知三个恶魔角色，其中一个在游戏中。",
     "name": "斥候",
     "team": "townsfolk",
-    "ability": "在你的首个夜晚，你会得知两个恶魔角色，其中一个在游戏中。第三天开始，在白天时，你可以私下询问说书人：得知恶魔角色。",
+    "ability": "在你的首个夜晚，你会得知三个恶魔角色，其中一个在游戏中。第三天开始，在白天时，你可以私下询问说书人：得知恶魔角色。",
     "firstNight": 40
   },
   {

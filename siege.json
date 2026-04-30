@@ -11,14 +11,14 @@
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/11_weicheng.png",
     "name": "Shieldbearer",
     "team": "townsfolk",
-    "ability": "While you are alive, Outsiders do not trigger their death effects when dying at night."
+    "ability": "When an Outsider dies at night, you become a Puppet — that Outsider's death ability does not trigger."
   },
   {
     "id": "12_siege",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/12_weicheng.png",
     "name": "Baroness",
     "team": "townsfolk",
-    "ability": "While you are alive, executed players do not trigger Outsider death effects."
+    "ability": "When an Outsider is executed, you become a Puppet — that Outsider's death ability does not trigger."
   },
   {
     "id": "_siege",
@@ -137,10 +137,10 @@
   {
     "id": "1_siege",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/1_weicheng.png",
-    "firstNightReminder": "On your first night, you learn 2 Demon characters; one is in play. From day 3, during the day, you may privately ask the Storyteller: learn the Demon character.",
+    "firstNightReminder": "On your first night, you learn 3 Demon characters; one is in play. From day 3, during the day, you may privately ask the Storyteller: learn the Demon character.",
     "name": "Scout",
     "team": "townsfolk",
-    "ability": "On your first night, you learn 2 Demon characters; one is in play. From day 3, during the day, you may privately ask the Storyteller: learn the Demon character.",
+    "ability": "On your first night, you learn 3 Demon characters; one is in play. From day 3, during the day, you may privately ask the Storyteller: learn the Demon character.",
     "firstNight": 40
   },
   {

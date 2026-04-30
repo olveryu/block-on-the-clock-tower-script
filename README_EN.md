@@ -15,8 +15,8 @@ Import URL: `https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-
 🏰 **Puppet Ecosystem**
 When Outsiders die, chain effects trigger: extra kills (Deserter), alignment conversion (Refugee), Puppet creation (Wounded), execution binding (Captive). Puppet death can retrigger Outsider effects — chains can snowball.
 
-🛡️ **Dual Protection**
-The Shieldbearer blocks night death chain effects (Outsiders still die, but effects don't trigger); the Baroness blocks execution chain effects. Good must leverage both lines of defense.
+🛡️ **Dual Protection (Absorption-style)**
+The Shieldbearer absorbs an Outsider's night-death chain — they become a Puppet, the chain effect doesn't trigger. The Baroness does the same for executions. One-shot each, and the absorbed bolt doesn't know they've been converted — they still believe they have the ability.
 
 🎭 **Four Distinct Demons**
 - **Siege Lord** — Sees the Grimoire each night. Pure information dominance.
@@ -40,14 +40,14 @@ Inquisitor (detect evil), Herald/Patrolman (detect Outsiders), Coroner (autopsy)
 | Coroner | Each night, choose a player: if they are dead, you learn if they are evil; if they are alive, you learn if they were woken tonight. |
 | Quartermaster | Each day, you may publicly choose a player: if they are a Minion or Outsider, they are drunk until next dawn. |
 | Chaplain | Each night, you learn how many alive players are no longer their original character. |
-| Shieldbearer | While you are alive, Outsiders do not trigger their death effects when dying at night. |
-| Baroness | While you are alive, executed players do not trigger Outsider death effects. |
+| Shieldbearer | When an Outsider dies at night, you become a Puppet — that Outsider's death ability does not trigger. |
+| Baroness | When an Outsider is executed, you become a Puppet — that Outsider's death ability does not trigger. |
 | Scribe | On your first night, you learn the sum of all Outsider & all Minion players' seats. |
 | Herald | Each day, you may privately visit the Storyteller & name 3 players: you learn if exactly one of them is an Outsider. |
 | Ranger | If you die at night, choose an alive player: if they are a non-Demon evil player, they lose their ability & die. |
 | Inquisitor | Each night, choose 3 other alive players: you learn if exactly one of them is a non-Demon evil player. |
 | Patrolman | Each night, choose a player: you learn if either alive neighbor of that player is an Outsider. |
-| Scout | On your first night, you learn 2 Demon characters; one is in play. From day 3, during the day, you may privately ask the Storyteller: learn the Demon character. |
+| Scout | On your first night, you learn 3 Demon characters; one is in play. From day 3, during the day, you may privately ask the Storyteller: learn the Demon character. |
 
 ### Outsiders (5)
 
@@ -89,7 +89,7 @@ Inquisitor (detect evil), Herald/Patrolman (detect Outsiders), Coroner (autopsy)
 
 2. **Beware the Hexer**: The Hexer turns a neighbor into a Puppet (=poisoned) each night. Your information might be false. When you get odd info, first ask "Am I hexed?" rather than trusting blindly.
 
-3. **Use Outsider chains to reason**: If Shieldbearer/Baroness is alive but Outsider death didn't chain → the effect was blocked → indirectly confirms Shieldbearer/Baroness identity.
+3. **Use Outsider chains to reason**: If the first Outsider death has no chain → Shieldbearer/Baroness was triggered and is now a Puppet. **Only the first triggers** — subsequent Outsider deaths chain normally. The converted Shieldbearer doesn't know they've been turned and may keep publicly claiming "I'm the Shieldbearer" — that's now Evil's smokescreen.
 
 4. **Locate the Hexer**: The Hexer can only pick neighbors. If your info was wrong, check your neighbors — the Hexer might be nearby.
 
@@ -147,7 +147,7 @@ Inquisitor (detect evil), Herald/Patrolman (detect Outsiders), Coroner (autopsy)
 
 2. **Hexer's Puppet effect**: The hexed player becomes a Puppet "tonight and tomorrow day". This means tonight's info is false and tomorrow's day ability is also nullified.
 
-3. **Chain or no chain?** Shieldbearer alive → night Outsider deaths don't trigger effects (but they still die). Baroness alive → executions don't trigger Outsider effects. They don't overlap.
+3. **Chain & absorption**: When an Outsider dies at night and the Shieldbearer is alive, sober, and healthy — the Shieldbearer instantly becomes a Puppet (swap their token in the Grimoire; do NOT tell them) and the Outsider death effect doesn't trigger. Baroness works the same for executions. After triggering, the bolt has no ability but still thinks they do — keep deceiving them per Puppet/Marionette protocol (wake them at night, give "no Outsider died" feedback, etc.).
 
 4. **Undead is special**: The Undead registers as an Outsider but isn't one — Herald/Patrolman detect them, but their death triggers the Puppet effect, not an Outsider effect.
 
@@ -161,6 +161,6 @@ Inquisitor (detect evil), Herald/Patrolman (detect Outsiders), Coroner (autopsy)
 
 The core tension of Siege Night: **Outsiders are both a burden for Good and a resource for Evil.**
 
-Good wants to keep Outsiders alive (to avoid chains), but Outsiders take up Good slots with no proactive abilities. Evil wants to kill Outsiders to trigger chains (create Puppets, convert alignments), but must avoid chains being blocked by Shieldbearer/Baroness.
+Good wants to keep Outsiders alive (to avoid chains), but Outsiders take up Good slots with no proactive abilities. Evil wants to kill Outsiders to trigger chains (create Puppets, convert alignments). Shieldbearer/Baroness can each absorb one chain, but the cost is becoming new Puppet ammunition — when they later die, an Outsider death effect still triggers.
 
 This creates a unique dynamic: **who to execute, who to kill at night, who to protect — every decision has cascading consequences.**
