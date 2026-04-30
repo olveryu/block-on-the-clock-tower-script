@@ -53,7 +53,7 @@ Inquisitor (detect evil), Herald/Patrolman (detect Outsiders), Coroner (autopsy)
 
 | Character | Death Effect |
 |-----------|-------------|
-| Deserter | When you die, that night the Demon must choose one of your alive neighbours: they die tonight. |
+| Deserter | When you die, that night the Demon must choose one of the Demon's alive neighbours: they die tonight. |
 | Refugee | When you die, that night the Demon must choose a good dead player: they turn evil. |
 | Wounded | When you die, that night the Demon must choose an alive player: they become a Puppet. |
 | Captive | When you die, that night the Demon must choose 2 players: they are bound — if one of them is executed, the other dies that night. |

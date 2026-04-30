@@ -163,9 +163,9 @@
     ],
     "name": "Deserter",
     "team": "outsider",
-    "ability": "When you die, that night the Demon must choose one of your alive neighbours: they die tonight.",
+    "ability": "When you die, that night the Demon must choose one of the Demon's alive neighbours: they die tonight.",
     "otherNight": 10,
-    "otherNightReminder": "If the Deserter died tonight, the Demon must choose one of the Deserter's alive neighbours: they die tonight."
+    "otherNightReminder": "If the Deserter died tonight, the Demon must choose one of the Demon's alive neighbours: they die tonight."
   },
   {
     "id": "14_siege",
