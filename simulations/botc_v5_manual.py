@@ -241,21 +241,49 @@ def kill_seat(s, seat, method):
             s['dead_man_active'] = False
             log.append(f"  ★ 死士复活: {s['dead_man_seat']} 从 {old} 变 {new}")
 
-    # 触发死亡链
-    save_baron = method == '处决' and s['has_baron']
-    save_shield = method == '夜杀' and s['has_shield']
-    if not save_baron and not save_shield:
-        role = p['role']
-        if role in OUTSIDERS:
-            log.append(f"  → 触发外来者死亡链: {role} (需手动调 trigger)")
-        elif role == '死士' or role == '傀儡' or '千面人' in role:
-            log.append(f"  → 触发傀儡死亡能力 (需手动调 trigger_puppet)")
-        # 先锋官 setup: 外来者"视为傀儡"只是 register, 不触发 (剧本没明说触发)
-    else:
-        log.append(f"  保险栓阻止触发")
+    # 触发死亡链 (v6 机制: 保险栓吸收而不是阻止)
+    role = p['role']
+    triggers_chain = (role in OUTSIDERS or role == '死士'
+                      or role == '傀儡' or '千面人' in role)
+    absorbed = False
+    if triggers_chain:
+        if method == '处决' and s['has_baron']:
+            baron_seat = next((int(k) for k, v in s['players'].items()
+                               if v['alive'] and v['role'] == '女伯爵'), None)
+            if baron_seat:
+                absorb_into_puppet(s, baron_seat, '女伯爵')
+                log.append(f"  ★ 女伯爵吸收: {baron_seat} ({get_p(s, baron_seat)['name']}) 变傀儡 (不告知)")
+                absorbed = True
+        elif method == '夜杀' and s['has_shield']:
+            shield_seat = next((int(k) for k, v in s['players'].items()
+                                if v['alive'] and v['role'] == '盾卫'), None)
+            if shield_seat:
+                absorb_into_puppet(s, shield_seat, '盾卫')
+                log.append(f"  ★ 盾卫吸收: {shield_seat} ({get_p(s, shield_seat)['name']}) 变傀儡 (不告知)")
+                absorbed = True
+
+        if not absorbed:
+            if role in OUTSIDERS:
+                log.append(f"  → 触发外来者死亡链: {role} (需手动调 trigger)")
+            elif role == '死士' or role == '傀儡' or '千面人' in role:
+                log.append(f"  → 触发傀儡死亡能力 (需手动调 trigger_puppet)")
+            # 先锋官 setup: 外来者"视为傀儡"只是 register, 不触发 (剧本没明说触发)
 
     save(s)
     return '\n'.join(log)
+
+
+def absorb_into_puppet(s, seat, old_role):
+    """保险栓吸收: 自己变傀儡 (不告知本人, 玩家仍以为有能力).
+    触发后日后该玩家死亡时仍会触发傀儡死亡链 (新弹药)."""
+    p = get_p(s, seat)
+    p['role'] = '傀儡'
+    p['puppet'] = True
+    p['register_outsider'] = True
+    if old_role == '女伯爵':
+        s['has_baron'] = False
+    elif old_role == '盾卫':
+        s['has_shield'] = False
 
 
 def trigger_refugee(s):
@@ -336,11 +364,13 @@ def info_for(s, seat, role, distorted=False):
         true_demon = get_p(s, s['demon_seats'][0])['role'] if s['demon_seats'] else None
         if not true_demon: return None
         if s['day'] == 1:
+            # v6: N1 学 3 demon (1 真 + 2 伪), 之前是 2 demon
             others = [d for d in DEMONS if d != true_demon]
-            fake = random.choice(others)
-            actual = sorted([true_demon, fake])
+            fakes = random.sample(others, 2)
+            actual = sorted([true_demon] + fakes)
             if distorted:
-                return {'declared': sorted(random.sample(others, 2)), 'actual': actual}
+                # 醉酒/中毒: 3 个非真 demon (确定性)
+                return {'declared': sorted(others), 'actual': actual}
             return {'declared': actual, 'actual': actual}
         else:
             if distorted:

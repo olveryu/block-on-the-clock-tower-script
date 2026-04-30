@@ -239,19 +239,20 @@ class InterrogatorPolicy(Policy):
 
 
 class ScoutPolicy(Policy):
-    """斥候: N1 学 2 demon 角色 (1 真), D3+ 白天学真 demon 角色"""
+    """斥候 (v6): N1 学 3 demon 角色 (1 真), D3+ 白天学真 demon 角色.
+    旧版 N1 学 2 demon, 改为 3 demon 是首夜情报削弱."""
 
     def __init__(self):
         super().__init__('斥候')
 
     def likelihood_real(self, event, world_state, alive_seats):
         if event.is_night and event.day == 1:
-            # N1: declared = sorted [demon1, demon2], 1 真
-            if not isinstance(event.declared_result, list) or len(event.declared_result) != 2:
+            # N1: declared = sorted [demon1, demon2, demon3], 1 真
+            if not isinstance(event.declared_result, list) or len(event.declared_result) != 3:
                 return 0
             # 善良 prior: demon 角色均匀分布 (4 选 1)
-            # P(真斥候 declares this pair | demon=d):
-            #   if d ∈ pair: 1/3 (pick the other), else 0
+            # P(真斥候 declares this triplet | demon=d):
+            #   if d ∈ triplet: 1/3 (pick 2 fakes from 3 non-d, C(3,2)=3 ways), else 0
             p = 0.0
             for d in DEMON_POOL:
                 if d in event.declared_result:
@@ -267,17 +268,17 @@ class ScoutPolicy(Policy):
 
     def likelihood_evil_bluff(self, event, world_state, alive_seats):
         if event.is_night and event.day == 1:
-            if not isinstance(event.declared_result, list) or len(event.declared_result) != 2:
+            if not isinstance(event.declared_result, list) or len(event.declared_result) != 3:
                 return 0
-            # 邪恶 装斥候: 知真 demon, 偏向编不含真 demon 的 pair (避暴露)
-            # 善良 prior: 真 demon 均匀
-            # P(邪恶 picks this pair | demon=d) = (3 含 d) → 0 此 d 应避免
-            #                                    = 1/3 不含 d 的 pair
+            # 邪恶 装斥候: 知真 demon, 偏向编不含真 demon 的 triplet (避暴露)
+            # 4 demons 选 3 = C(4,3)=4 种 triplet:
+            #   1 种不含 d (= 3 非真 demon) — 邪恶 avoiding 唯一选择
+            #   3 种含 d — 邪恶 装诚实 (低概率)
             p = 0.0
             for d in DEMON_POOL:
                 if d not in event.declared_result:
-                    # 邪恶 picks pair from {non-d}: C(3,2)=3 pairs, uniform
-                    p += 0.25 * (1.0 / 3)
+                    # 邪恶 picks the unique avoid-triplet (all 3 non-d demons)
+                    p += 0.25 * 1.0
                 else:
                     # 邪恶 也可能装诚实 (含真 demon), 概率较低
                     p += 0.25 * 0.1
@@ -994,26 +995,28 @@ class Game:
             return None
 
     def gen_scout_event(self, seat, is_real=True):
-        """斥候 N1 / D3+"""
+        """斥候 N1 / D3+ (v6: N1 改为 3 demon, 之前是 2 demon)"""
         p = self.players[seat]
         if is_real:
             true_demon = self.players[self.demon_seats[0]].role if self.demon_seats else None
             if not true_demon: return None
             others = [d for d in DEMON_POOL if d != true_demon]
-            fake = random.choice(others)
-            actual = sorted([true_demon, fake])
+            # N1: 3 demon (real + 2 fakes). 仅有 3 个非真 demon, 取 2 个伪
+            fakes = random.sample(others, 2)
+            actual = sorted([true_demon] + fakes)
             if self.is_info_distorted(seat):
-                declared = sorted(random.sample(others, 2))
+                # 醉酒/中毒: 看到 3 个非真 demon (确定性, 因为只有 3 个非真)
+                declared = sorted(others)
             else:
                 declared = actual
             return InfoEvent(seat, '斥候', p.role, self.day, self.day == 1,
                             actual_result=actual, declared_result=declared,
                             is_distorted=self.is_info_distorted(seat))
         else:
-            options = list(DEMON_POOL)
-            random.shuffle(options)
+            # 邪恶装斥候: 随机 3 demon (与原版 2-demon 一致, 简化处理 — 不建模 avoid 策略)
+            declared = sorted(random.sample(DEMON_POOL, 3))
             return InfoEvent(seat, '斥候', p.role, self.day, self.day == 1,
-                            declared_result=sorted(options[:2]), is_fake_bluff=True)
+                            declared_result=declared, is_fake_bluff=True)
 
     def gen_patroller_event(self, seat, is_real=True):
         p = self.players[seat]
@@ -1211,12 +1214,42 @@ class Game:
         return True
 
     def _should_trigger_death(self, seat, method):
+        """新机制 (v6): 保险栓不再"阻止", 而是"吸收" — 触发时本人变傀儡 (silent),
+        has_save_baron/has_save_shield 翻转. 一次有效."""
         p = self.players[seat]
-        if method == '处决' and self.has_save_baron: return False
-        if method == '夜杀' and self.has_save_shield: return False
-        if p.role in OUTSIDER_POOL or p.role == '傀儡' or '千面人' in p.role or p.role == '死士':
-            return True
-        return False
+        # 死亡是否触发链由角色决定 (注册为外来者者: 外来者/傀儡/死士/千面人)
+        triggers_chain = (p.role in OUTSIDER_POOL or p.role == '傀儡'
+                          or '千面人' in p.role or p.role == '死士')
+        if not triggers_chain:
+            return False
+        # 保险栓吸收: 处决 → 女伯爵; 夜杀 → 盾卫
+        if method == '处决' and self.has_save_baron:
+            baron_seat = next((s for s in self.alive_seats()
+                               if self.players[s].role == '女伯爵'), None)
+            if baron_seat is not None:
+                self._absorb_into_puppet(baron_seat, '女伯爵')
+                return False
+        if method == '夜杀' and self.has_save_shield:
+            shield_seat = next((s for s in self.alive_seats()
+                                if self.players[s].role == '盾卫'), None)
+            if shield_seat is not None:
+                self._absorb_into_puppet(shield_seat, '盾卫')
+                return False
+        return True
+
+    def _absorb_into_puppet(self, seat, old_role):
+        """保险栓吸收外来者死亡链: 自己变傀儡 (不告知本人, 玩家仍以为有能力).
+        触发后角色翻转为'傀儡', register_outsider=True, has_save_* 翻转 False.
+        日后该玩家死亡时仍会触发傀儡死亡链 (新弹药)."""
+        p = self.players[seat]
+        p.role = '傀儡'
+        p.puppet = True
+        p.register_outsider = True
+        if old_role == '女伯爵':
+            self.has_save_baron = False
+        elif old_role == '盾卫':
+            self.has_save_shield = False
+        self.log(f'  ★ {old_role}吸收: {seat} ({p.name}) 变傀儡 (不告知)', 1)
 
     def _trigger_death_chain(self, seat):
         """外来者死亡只触发自己能力. 死士/傀儡/千面人 才触发傀儡能力 (各自 ability 明说)."""
