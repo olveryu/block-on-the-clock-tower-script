@@ -232,7 +232,7 @@
     ],
     "name": "Sleeper",
     "team": "minion",
-    "ability": "You think you are a Townsfolk character, but you are not. If the Demon dies, you become that Demon. When you die, a Puppet's death effect is triggered. The Demon & Minions know you are the Sleeper."
+    "ability": "You think you are a Townsfolk character, but you are not. You also register as an Outsider. If the Demon dies, you become that Demon. When you die, a Puppet's death effect is triggered. The Demon & Minions know you are the Sleeper."
   },
   {
     "id": "21_siege",

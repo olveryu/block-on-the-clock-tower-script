@@ -65,7 +65,7 @@ Inquisitor (detect evil), Herald/Patrolman (detect Outsiders), Gravedigger (inhe
 |-----------|---------|
 | Mole | On your first night, choose an alive player: at the start of tomorrow's day, you both become a Puppet. |
 | Undead | You think you are an Outsider character, but you are not. You also register as an Outsider. If the Demon dies, you become that Demon. When you die, trigger a Puppet's death ability. The Demon & Minions know you are the Undead. |
-| Sleeper | You think you are a Townsfolk character, but you are not. If the Demon dies, you become that Demon. When you die, a Puppet's death effect is triggered. The Demon & Minions know you are the Sleeper. |
+| Sleeper | You think you are a Townsfolk character, but you are not. You also register as an Outsider. If the Demon dies, you become that Demon. When you die, a Puppet's death effect is triggered. The Demon & Minions know you are the Sleeper. |
 | Hexer | Each night, choose an alive neighbor: they become a Puppet tonight and tomorrow day. |
 
 ### Demons (4)
