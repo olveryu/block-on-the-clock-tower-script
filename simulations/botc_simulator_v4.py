@@ -378,29 +378,30 @@ class PatrollerPolicy(Policy):
 
 
 class DoctorPolicy(Policy):
-    """军医: 死人验邪恶, 活人验唤醒"""
+    """军医 (v2): 选 2 名其他存活玩家, 至少 1 人今晚被唤醒.
+    旧版: 选 1 玩家死人验邪恶/活人验唤醒, 改为 2 人范围 yes 是削弱."""
 
     def __init__(self):
         super().__init__('军医')
 
     def likelihood_real(self, event, world_state, alive_seats):
-        if not event.targets: return 0
-        # 真军医, 估 P(declared) by世界状态
-        t = event.targets[0]
-        # 简化: yes 概率约 30% (真邪恶 + 唤醒角色)
-        p_yes = 0.30
+        if not event.targets or len(event.targets) != 2: return 0
+        # 真军医: 选 2 人中至少 1 被唤醒
+        # 估计 P(target 被唤醒) ≈ 0.45 (邪恶+信息源+恶魔约 5-6/12 角色)
+        # P(2 人至少 1 被唤醒) = 1 - (1-0.45)^2 ≈ 0.70
+        p_yes = 0.70
         if event.declared_result == True:
-            return p_yes / 11
+            return p_yes / 66  # C(11,2) 约略
         else:
-            return (1 - p_yes) / 11
+            return (1 - p_yes) / 66
 
     def likelihood_evil_bluff(self, event, world_state, alive_seats):
-        if not event.targets: return 0
+        if not event.targets or len(event.targets) != 2: return 0
         # 邪恶 bluff 军医: 偏 yes 框真镇民
         if event.declared_result == True:
-            return 0.65 / 11
+            return 0.75 / 66
         else:
-            return 0.35 / 11
+            return 0.25 / 66
 
 
 class PriestPolicy(Policy):
@@ -877,7 +878,9 @@ class Game:
                 options = [b for b in self.bluffs if b not in used]
             else:
                 if random.random() < 0.6:
-                    pool = self.not_in_play_outsiders + self.outsiders
+                    # 爪牙装外来者只从"不在场外来者"里选, 避免与场上真外来者撞角色
+                    # (高玩级邪恶 N0 不会撞角色; 此处修复 setup bug)
+                    pool = self.not_in_play_outsiders
                     options = [r for r in pool if r not in used]
                 if not options:
                     options = [b for b in self.bluffs if b not in used]
@@ -1037,23 +1040,24 @@ class Game:
                             is_fake_bluff=True)
 
     def gen_doctor_event(self, seat, is_real=True):
+        """军医 v2: 选 2 名其他存活玩家, 至少 1 人今晚被唤醒"""
         p = self.players[seat]
-        cands = [s for s in self.players if s != seat]
-        if not cands: return None
-        chosen = random.choice(cands)
+        cands = [s for s in self.alive_seats() if s != seat]
+        if len(cands) < 2: return None
+        chosen = random.sample(cands, 2)
         if is_real:
-            tgt = self.players[chosen]
-            if not tgt.alive:
-                actual = tgt.team == '邪恶' or tgt.register_minion
-            else:
-                actual = (tgt.team == '邪恶' or tgt.role in INFO_SOURCES or is_demon_role(tgt.role))
+            # 至少 1 人被唤醒: 邪恶/信息源/恶魔被视为有夜活
+            def is_woken(s):
+                pp = self.players[s]
+                return pp.team == '邪恶' or pp.role in INFO_SOURCES or is_demon_role(pp.role)
+            actual = any(is_woken(s) for s in chosen)
             declared = (not actual) if self.is_info_distorted(seat) else actual
             return InfoEvent(seat, '军医', p.role, self.day, True,
-                            targets=[chosen], actual_result=actual, declared_result=declared,
+                            targets=chosen, actual_result=actual, declared_result=declared,
                             is_distorted=self.is_info_distorted(seat))
         else:
             return InfoEvent(seat, '军医', p.role, self.day, True,
-                            targets=[chosen], declared_result=random.choice([True, False]),
+                            targets=chosen, declared_result=random.choice([True, False]),
                             is_fake_bluff=True)
 
     def gen_priest_event(self, seat, is_real=True):
@@ -1400,6 +1404,11 @@ class Game:
         demons = self.alive_demons()
         if not demons: return '善良'
         if len(alive) <= 2 and demons: return '邪恶'
+        # 修复模拟器死锁: 善良全死(alive 全是邪恶) → 邪恶胜
+        # (真实游戏中这种局面下千面人会互相投出一个 → alive 降到 2,
+        # 但模拟器投票模型不够强, 会 D8-D15 干瞪眼超时)
+        evil_alive = [s for s in alive if self.players[s].team == '邪恶']
+        if alive and len(evil_alive) == len(alive): return '邪恶'
         return None
 
     def play(self):

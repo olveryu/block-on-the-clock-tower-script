@@ -122,16 +122,13 @@
   {
     "id": "6_siege",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/6_weicheng.png",
-    "firstNightReminder": "Each night, choose a player: if they are dead, you learn if they are evil; if they are alive, you learn if they were woken tonight.",
-    "otherNightReminder": "Each night, choose a player: if they are dead, you learn if they are evil; if they are alive, you learn if they were woken tonight.",
+    "otherNightReminder": "Once per game, at night*, choose a dead player: you become their character.",
     "reminders": [
-      "Autopsy",
-      "Monitor"
+      "No ability"
     ],
-    "name": "Coroner",
+    "name": "Gravedigger",
     "team": "townsfolk",
-    "ability": "Each night, choose a player: if they are dead, you learn if they are evil; if they are alive, you learn if they were woken tonight.",
-    "firstNight": 50,
+    "ability": "Once per game, at night*, choose a dead player: you become their character.",
     "otherNight": 22
   },
   {
@@ -230,15 +227,12 @@
   {
     "id": "20_siege",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/20_weicheng.png",
-    "otherNightReminder": "Each night*, you may choose a Demon character: choose to make yourself or the Demon become that character; the other becomes a Puppet.",
-    "reminders": [
-      "Transform"
+    "remindersGlobal": [
+      "Sleeper"
     ],
-    "setup": true,
-    "name": "Turncoat",
+    "name": "Sleeper",
     "team": "minion",
-    "ability": "Each night*, you may choose a Demon character: choose to make yourself or the Demon become that character; the other becomes a Puppet. [+1 Outsider]",
-    "otherNight": 3
+    "ability": "You think you are a Townsfolk character, but you are not. If the Demon dies, you become that Demon. When you die, a Puppet's death effect is triggered. The Demon & Minions know you are the Sleeper."
   },
   {
     "id": "21_siege",
@@ -253,15 +247,14 @@
   {
     "id": "24_siege",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/24_weicheng.png",
-    "firstNightReminder": "Each night, you see the Grimoire.",
-    "otherNightReminder": "Each night, you see the Grimoire. Each night*, choose a player: they die.",
+    "otherNightReminder": "Each night*, choose a player: they die. If you killed an Outsider, choose an alive player: they turn evil.",
     "reminders": [
-      "Dead"
+      "Dead",
+      "Turned evil"
     ],
-    "name": "Siege Lord",
+    "name": "Conqueror",
     "team": "demon",
-    "ability": "Each night, you see the Grimoire. Each night*, choose a player: they die.",
-    "firstNight": 30,
+    "ability": "Each night*, choose a player: they die. If you killed an Outsider, choose an alive player: they turn evil. When evil would win, all players close their eyes & each point at 2 players; evil players lower their hands — if the top 2 among good players' choices are the starting evil players, good wins instead.",
     "otherNight": 6
   },
   {
@@ -274,7 +267,7 @@
     "setup": true,
     "name": "Vanguard",
     "team": "demon",
-    "ability": "Each night*, choose a player: they die. Outsiders also register as a Puppet. [+1 Outsider]",
+    "ability": "Each night*, choose a player: they die. When an Outsider dies, a Puppet's death effect is triggered instead. [+1 Outsider]",
     "otherNight": 8
   },
   {

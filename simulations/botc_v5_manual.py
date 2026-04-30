@@ -116,8 +116,10 @@ def setup(seed=None):
                     bluff = random.choice(bluffs)
             else:
                 # 爪牙: 60% 装外来者, 40% 装镇民
+                # 装外来者只从"不在场外来者"里选, 避免与场上真外来者撞角色
+                # (高玩级邪恶 N0 不会撞角色; 此处修复 setup bug)
                 if random.random() < 0.6:
-                    pool = state['not_in_play_outsiders'] + state['outsiders']
+                    pool = state['not_in_play_outsiders']
                     avail = [r for r in pool if r not in used_bluffs]
                     if avail:
                         bluff = random.choice(avail)
