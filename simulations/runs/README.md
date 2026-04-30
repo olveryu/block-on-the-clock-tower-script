@@ -24,6 +24,7 @@ YYYYMMDD_seedNNNNN_<mechanic>_<runner>.md
 | 2026-04-29 | 75112 | v2 | v5manual (detailed) | 善良 | **D1** | 零保险栓 setup, 邪恶撞角色 ×2, 攻城将军 N1 被军医+审讯锁 |
 | 2026-04-29 | 45586 | v2 | v5manual (detailed) | 善良 | **D1** | bluff 修复后, 先锋官恶魔被军医 N1 直接拆 bluff |
 | 2026-04-29 | 80263 | **v3** | v5manual (detailed) | **善良反胜** | D7 | 征服者末日反胜实战首发, 潜伏者+掘墓人+先锋官重定向都触发 |
+| 2026-04-29 | 37080 | **v3 完整** | v5manual (实跑 trigger + 3 层结构 + ≥5 句/人/天) | 善良 | D3 | 先锋官+零保险栓, 严格遵守 instructions 规范, 8 对私聊 + 多轮公开讨论 |
 
 ## 批量自动测试
 

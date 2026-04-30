@@ -1660,8 +1660,9 @@ class Game:
                     self.log(f'  ★ 暗箭手 N1: 选 {target} ({p.name}) 变傀儡', 1)
 
     def _dawn_actions(self):
-        """D2+ 黎明: 内应双变傀儡 (内应 N1 选了目标的话)"""
-        if self.day < 2 or not self.mole_target: return
+        """D1+ 黎明: 内应双变傀儡 (内应 N1 选了目标 → D1 dawn 触发).
+        修正: 之前误为 D2+, 实际剧本是'明天白天' = N1 后第一个白天 = D1."""
+        if not self.mole_target: return
         target = self.mole_target
         # 内应自己 + target 都变傀儡
         for s, p in self.players.items():

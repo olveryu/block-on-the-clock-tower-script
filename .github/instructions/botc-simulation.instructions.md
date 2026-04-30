@@ -4,6 +4,97 @@ description: "Use when simulating Blood on the Clocktower (染·钟楼谜团/血
 
 # BotC 游戏模拟规范
 
+## ⚠️ 第一铁律：每人每天 ≥ 5 句话 + 严格 3 层结构
+
+**模拟时违反这条 = 直接失败。**
+
+### 5 句话规则
+- 活的玩家**每个白天**必须有 ≥ 5 句发言
+- 死人不算（不需要凑数）
+- 5 句分布：私聊 ~2 句 + 公开讨论 ~2 句 + 提名/投票 ~1 句
+- **不能**用"投 X" 这种一字回应凑数——每句应有实际内容（推理/反驳/同意/质疑）
+
+### 3 层结构（白天严格遵守）
+```
+1. 黎明（announce 死亡 + trigger_mole_dawn 等延迟效果）
+2. 私聊阶段（信息流主战场，60-70% 篇幅）
+   - 每对 2-4 句对话
+   - 至少 5-8 对私聊（不是每对都写，但要让所有活人参与至少 1 对）
+3. 公开讨论（渐进公开）
+   - 每个活的信息源公开自己的信息
+   - 然后多轮讨论（每人 2-3 轮）
+4. 提名 + 投票
+   - 每人投票时给理由
+```
+
+### 自查清单（D 末必查）
+- [ ] 这个白天每个活人是否 ≥ 5 句话？
+- [ ] 私聊写了至少 5 对（覆盖所有活人）？
+- [ ] 公开阶段每个活人都说话了？
+- [ ] 投票时每人都给了理由？
+
+**做不到这些就重写这一天，不要继续。**
+
+---
+
+## ⚠️ 第二铁律：禁止凭记忆叙事，必须实跑 v5 trigger
+
+**只要做围城之夜的模拟（v5_manual.py 驱动），每个阶段必须用 Bash 实际调用对应的 trigger 函数，禁止凭记忆叙事。**
+
+凭记忆 = 必漏机制 = 浪费用户时间 = 不能接受。代码已经写好所有 trigger 函数，必须用，不能偷懒。
+
+### 每阶段必跑的 trigger 清单
+
+| 阶段 | 必调函数 | 触发条件 |
+|---|---|---|
+| N0 | `setup(seed)` | 初始化 |
+| N1 | `trigger_archer_n1(s, t)` | 暗箭手在场 |
+| N1 | `set_mole_n1_target(s, t)` | 内应在场 |
+| N1+ 每晚 | `trigger_hex(s, t)` | 蛊惑者在场 |
+| **D1+ 黎明** | `trigger_mole_dawn(s)` | **D1 dawn 就触发！**（"明天白天" = N1 后第一个白天 = D1）。即使内应已死目标仍变傀儡 |
+| 处决/夜杀 | `kill_seat(s, seat, method)` | 自动处理保险栓吸收+傀儡链+俘虏绑定 |
+| 暗箭杀 N1 目标 | `trigger_archer_swap(s, e)` | swap 必须执行 |
+| 征服者杀外来者 | `trigger_conqueror_outsider(s, t)` | 选活人变邪恶 |
+| 死亡链 trigger | `trigger_refugee/wounded/deserter/captive(s, ...)` | 邪恶选效果时 |
+| 傀儡死亡 | `trigger_puppet(s, choice, target)` | 傀儡/死士/潜伏者/千面人死时 |
+| D* 白天 | `trigger_quartermaster(s, t)` | 军需官在场 |
+| 游侠夜死 | `trigger_ranger(s, r, t)` | 游侠夜死时 |
+| 掘墓人 N* | `trigger_gravedigger(s, gd, dead)` | 掘墓人选死人变身 |
+| 末日反胜 | `final_judgment(s)` | 征服者+邪恶 alive ≤ 2 时 |
+
+### 工作流要求
+
+每写一个阶段（N1/D1/N2/D2...）必须：
+
+1. **Bash 调 trigger 函数**——产生真 state 变化
+2. **Read state 文件**（`/tmp/sim_v5_*.json`）查 alive/role/team/puppet/has_baron 等
+3. **基于真 state 写 dialogue**——不凭记忆
+
+**禁止**：
+- ❌ 凭记忆说"s4 内应 D1 死了，所以 D2 黎明 s3 不变"——必须 trigger_mole_dawn 跑过看 state
+- ❌ 凭记忆说"暗箭手交换 s12 ↔ s4"——必须 trigger_archer_swap 跑过 (function 自动选 alive 邪恶)
+- ❌ 凭记忆说"牧师数 4"——必须查 state 算 (`role != original_role` 的活人数)
+
+### 常见漏掉的延迟效果
+
+1. **内应 N1 选目标 → D1 黎明双变傀儡**（"明天白天"=N1 后第一个白天=D1。即使内应 D1 处决死了，目标仍变。注意是 D1 dawn 不是 D2！）
+2. **暗箭手交换** —— 杀 N1 目标后**必须** swap with alive 邪恶玩家
+3. **蛊惑者每晚** —— 不是只 N1 用一次
+4. **军需官每天** —— 每个白天都得调
+5. **牧师数变身** —— 必须精确数 `role != original_role` 的活人
+6. **征服者末日反胜** —— alive ≤ 2 with demon 必须触发，不能跳过
+
+### 自查清单（写完每个阶段后）
+
+- [ ] 这个阶段所有在场角色的 trigger 是否调过？
+- [ ] state 文件里 alive/role/team 是否反映了我写的 dialogue？
+- [ ] 牧师数变身的数字是否和 state 一致？
+- [ ] 私聊里玩家"知道"的信息是否符合他们能看到的 state？
+
+**做不到这些就不要写——直接告诉用户"我需要先跑 trigger"。**
+
+---
+
 ## 〇、模拟格式（最重要——常被忽略）
 
 **白天的三段结构必须严格遵守**：

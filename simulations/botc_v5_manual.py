@@ -439,7 +439,8 @@ def trigger_hex(s, target_seat):
 
 
 def trigger_mole_dawn(s):
-    """内应黎明 (D2 起): 内应 + N1 选定目标双变傀儡"""
+    """内应黎明 (D1 起, 即 N1 后第一个白天): 内应 + N1 选定目标双变傀儡.
+    内应 ability: '在你的首个夜晚 ... 在明天白天开始时'，即 D1 dawn 触发."""
     target = s.get('mole_n1_target')
     if not target:
         return "内应 N1 没选过目标"
@@ -448,6 +449,7 @@ def trigger_mole_dawn(s):
     if mole and get_p(s, mole)['role'] == '内应':
         get_p(s, mole)['role'] = '傀儡'
         get_p(s, mole)['puppet'] = True
+        get_p(s, mole)['register_outsider'] = True  # 傀儡 register 外
     if get_p(s, target)['alive'] and get_p(s, target)['role'] != '傀儡':
         get_p(s, target)['role'] = '傀儡'
         get_p(s, target)['puppet'] = True

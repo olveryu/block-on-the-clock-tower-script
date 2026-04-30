@@ -1,0 +1,267 @@
+{
+  "demon_role": "先锋官",
+  "is_lunatic": false,
+  "outsiders": [
+    "逃兵",
+    "伤兵",
+    "俘虏"
+  ],
+  "townsfolk": [
+    "游侠",
+    "斥候",
+    "军需官",
+    "密探",
+    "纹章官",
+    "掘墓人"
+  ],
+  "bluffs": [
+    "女伯爵",
+    "牧师",
+    "书记官"
+  ],
+  "not_in_play_outsiders": [
+    "难民"
+  ],
+  "not_in_play_minions": [
+    "内应",
+    "潜伏者"
+  ],
+  "players": {
+    "1": {
+      "seat": 1,
+      "name": "阿信",
+      "role": "纹章官",
+      "original_role": "纹章官",
+      "team": "镇民",
+      "alive": true,
+      "is_drunk": false,
+      "is_hexed": false,
+      "register_outsider": false,
+      "register_minion": false,
+      "bluff_role": null,
+      "claimed_role": "纹章官",
+      "puppet": false
+    },
+    "2": {
+      "seat": 2,
+      "name": "小白",
+      "role": "死士",
+      "original_role": "死士",
+      "team": "邪恶",
+      "alive": false,
+      "is_drunk": false,
+      "is_hexed": false,
+      "register_outsider": true,
+      "register_minion": true,
+      "bluff_role": "难民",
+      "claimed_role": "难民",
+      "puppet": false
+    },
+    "3": {
+      "seat": 3,
+      "name": "二哥",
+      "role": "俘虏",
+      "original_role": "俘虏",
+      "team": "外来者",
+      "alive": true,
+      "is_drunk": false,
+      "is_hexed": false,
+      "register_outsider": true,
+      "register_minion": false,
+      "bluff_role": null,
+      "claimed_role": "俘虏",
+      "puppet": false
+    },
+    "4": {
+      "seat": 4,
+      "name": "月儿",
+      "role": "先锋官",
+      "original_role": "先锋官",
+      "team": "邪恶",
+      "alive": false,
+      "is_drunk": false,
+      "is_hexed": false,
+      "register_outsider": false,
+      "register_minion": false,
+      "bluff_role": "牧师",
+      "claimed_role": "牧师",
+      "puppet": false
+    },
+    "5": {
+      "seat": 5,
+      "name": "老王",
+      "role": "斥候",
+      "original_role": "斥候",
+      "team": "镇民",
+      "alive": false,
+      "is_drunk": false,
+      "is_hexed": false,
+      "register_outsider": false,
+      "register_minion": false,
+      "bluff_role": null,
+      "claimed_role": "斥候",
+      "puppet": false
+    },
+    "6": {
+      "seat": 6,
+      "name": "阿龙",
+      "role": "蛊惑者",
+      "original_role": "蛊惑者",
+      "team": "邪恶",
+      "alive": false,
+      "is_drunk": false,
+      "is_hexed": false,
+      "register_outsider": false,
+      "register_minion": true,
+      "bluff_role": "书记官",
+      "claimed_role": "书记官",
+      "puppet": false
+    },
+    "7": {
+      "seat": 7,
+      "name": "莉莉",
+      "role": "游侠",
+      "original_role": "游侠",
+      "team": "镇民",
+      "alive": true,
+      "is_drunk": false,
+      "is_hexed": false,
+      "register_outsider": false,
+      "register_minion": false,
+      "bluff_role": null,
+      "claimed_role": "游侠",
+      "puppet": false
+    },
+    "8": {
+      "seat": 8,
+      "name": "小七",
+      "role": "伤兵",
+      "original_role": "伤兵",
+      "team": "外来者",
+      "alive": true,
+      "is_drunk": false,
+      "is_hexed": false,
+      "register_outsider": true,
+      "register_minion": false,
+      "bluff_role": null,
+      "claimed_role": "伤兵",
+      "puppet": false
+    },
+    "9": {
+      "seat": 9,
+      "name": "大刘",
+      "role": "密探",
+      "original_role": "密探",
+      "team": "镇民",
+      "alive": true,
+      "is_drunk": false,
+      "is_hexed": false,
+      "register_outsider": false,
+      "register_minion": false,
+      "bluff_role": null,
+      "claimed_role": "密探",
+      "puppet": false
+    },
+    "10": {
+      "seat": 10,
+      "name": "苗苗",
+      "role": "掘墓人",
+      "original_role": "掘墓人",
+      "team": "镇民",
+      "alive": false,
+      "is_drunk": false,
+      "is_hexed": false,
+      "register_outsider": false,
+      "register_minion": false,
+      "bluff_role": null,
+      "claimed_role": "掘墓人",
+      "puppet": false
+    },
+    "11": {
+      "seat": 11,
+      "name": "阿强",
+      "role": "军需官",
+      "original_role": "军需官",
+      "team": "镇民",
+      "alive": true,
+      "is_drunk": false,
+      "is_hexed": false,
+      "register_outsider": false,
+      "register_minion": false,
+      "bluff_role": null,
+      "claimed_role": "军需官",
+      "puppet": false
+    },
+    "12": {
+      "seat": 12,
+      "name": "雪儿",
+      "role": "逃兵",
+      "original_role": "逃兵",
+      "team": "外来者",
+      "alive": true,
+      "is_drunk": false,
+      "is_hexed": false,
+      "register_outsider": true,
+      "register_minion": false,
+      "bluff_role": null,
+      "claimed_role": "逃兵",
+      "puppet": false
+    }
+  },
+  "evil_seats": [
+    2,
+    4,
+    6
+  ],
+  "demon_seats": [
+    4
+  ],
+  "minion_seats": [
+    2,
+    6
+  ],
+  "has_baron": false,
+  "has_shield": false,
+  "dead_man_seat": 2,
+  "dead_man_active": true,
+  "evil_dead_votes": [
+    5
+  ],
+  "archer_n1_target": null,
+  "archer_swapped": false,
+  "hex_target": 5,
+  "drunk_target": null,
+  "deaths": [
+    [
+      "D1",
+      6,
+      "蛊惑者"
+    ],
+    [
+      "N2",
+      5,
+      "斥候"
+    ],
+    [
+      "D2",
+      2,
+      "死士"
+    ],
+    [
+      "N3",
+      10,
+      "掘墓人"
+    ],
+    [
+      "D3",
+      4,
+      "先锋官"
+    ]
+  ],
+  "events": [],
+  "public_log": [],
+  "private_log": [],
+  "phase": "N0",
+  "day": 3,
+  "dead_man_role": "死士"
+}
