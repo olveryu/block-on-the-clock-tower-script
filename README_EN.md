@@ -13,7 +13,7 @@ Import URL: `https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-
 ### Key Features
 
 🏰 **Puppet Ecosystem**
-When Outsiders die, chain effects trigger: extra kills (Deserter), alignment conversion (Refugee), Puppet creation (Wounded), character replacement (Captive). Puppet death can retrigger Outsider effects — chains can snowball.
+When Outsiders die, chain effects trigger: extra kills (Deserter), alignment conversion (Refugee), Puppet creation (Wounded), execution binding (Captive). Puppet death can retrigger Outsider effects — chains can snowball.
 
 🛡️ **Dual Protection**
 The Shieldbearer blocks night death chain effects (Outsiders still die, but effects don't trigger); the Baroness blocks execution chain effects. Good must leverage both lines of defense.
@@ -53,10 +53,10 @@ Inquisitor (detect evil), Herald/Patrolman (detect Outsiders), Coroner (autopsy)
 
 | Character | Death Effect |
 |-----------|-------------|
-| Deserter | When you die, that night the Demon must choose an alive player: they die tonight. |
-| Refugee | When you die, that night the Demon must choose a good dead player: they turn evil. (Once only) |
+| Deserter | When you die, that night the Demon must choose one of your alive neighbours: they die tonight. |
+| Refugee | When you die, that night the Demon must choose a good dead player: they turn evil. |
 | Wounded | When you die, that night the Demon must choose an alive player: they become a Puppet. |
-| Captive | When you die, that night the Demon must choose an alive player & a good character (not in play): they are "mad" they are this character, or might be executed. |
+| Captive | When you die, that night the Demon must choose 2 players: they are bound — if one of them is executed, the other dies that night. |
 | Puppet | You think you are a good character, but you are not. When you die, that night the Demon must choose an Outsider character (different to last time): trigger that Outsider's death ability. [Does not appear during setup] |
 
 ### Minions (4)

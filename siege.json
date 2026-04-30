@@ -163,9 +163,9 @@
     ],
     "name": "Deserter",
     "team": "outsider",
-    "ability": "When you die, that night the Demon must choose an alive player: they die tonight.",
+    "ability": "When you die, that night the Demon must choose one of your alive neighbours: they die tonight.",
     "otherNight": 10,
-    "otherNightReminder": "If the Deserter died tonight, the Demon must choose an alive player: they die tonight."
+    "otherNightReminder": "If the Deserter died tonight, the Demon must choose one of the Deserter's alive neighbours: they die tonight."
   },
   {
     "id": "14_siege",
@@ -175,21 +175,21 @@
     ],
     "name": "Refugee",
     "team": "outsider",
-    "ability": "When you die, that night the Demon must choose a good dead player: they turn evil. (Once only)",
+    "ability": "When you die, that night the Demon must choose a good dead player: they turn evil.",
     "otherNight": 11,
-    "otherNightReminder": "If the Refugee died tonight and the Refugee effect has not triggered before, the Demon must choose a good dead player: they turn evil."
+    "otherNightReminder": "If the Refugee died tonight, the Demon must choose a good dead player: they turn evil."
   },
   {
     "id": "16_siege",
     "image": "https://raw.githubusercontent.com/olveryu/blood-on-the-clock-tower-script/main/images/16_weicheng.png",
     "remindersGlobal": [
-      "Mad"
+      "Bound"
     ],
     "name": "Captive",
     "team": "outsider",
-    "ability": "When you die, that night the Demon must choose an alive player & a good character (not in play): they are \"mad\" they are this character, or might be executed.",
+    "ability": "When you die, that night the Demon must choose 2 players: they are bound — if one of them is executed, the other dies that night.",
     "otherNight": 13,
-    "otherNightReminder": "If the Captive died tonight, the Demon must choose an alive player & a good character (not in play): they are \"mad\" they are this character, or might be executed."
+    "otherNightReminder": "If the Captive died tonight, the Demon must choose 2 players: they are bound — if one of them is executed, the other dies that night."
   },
   {
     "id": "17_siege",
