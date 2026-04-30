@@ -28,13 +28,16 @@ from itertools import combinations
 
 # ============= 角色池 (与 v3 同) =============
 TOWNSFOLK_POOL = [
-    '斥候', '密探', '巡逻兵', '审讯官', '游侠', '军医',
+    '斥候', '密探', '巡逻兵', '审讯官', '游侠', '掘墓人',
     '书记官', '军需官', '牧师', '纹章官', '盾卫', '女伯爵', '瞭望兵'
 ]
 OUTSIDER_POOL = ['伤兵', '逃兵', '难民', '俘虏']
-MINION_POOL = ['内应', '蛊惑者', '叛将', '死士']
-DEMON_POOL = ['攻城将军', '先锋官', '千面人', '暗箭手']
-INFO_SOURCES = {'斥候', '密探', '巡逻兵', '审讯官', '书记官', '纹章官', '瞭望兵', '军医', '牧师'}
+MINION_POOL = ['内应', '蛊惑者', '潜伏者', '死士']
+DEMON_POOL = ['征服者', '先锋官', '千面人', '暗箭手']
+# 信息源 (N1+ 唤醒型)
+INFO_SOURCES = {'斥候', '密探', '巡逻兵', '审讯官', '书记官', '纹章官', '瞭望兵', '牧师'}
+# 复活栈触发: 死士 + 潜伏者
+RESURRECTION_ROLES = {'死士', '潜伏者'}
 ALL_ROLES = TOWNSFOLK_POOL + OUTSIDER_POOL + MINION_POOL + DEMON_POOL
 PLAYERS = ['阿信', '小白', '二哥', '月儿', '老王', '阿龙',
            '莉莉', '小七', '大刘', '苗苗', '阿强', '雪儿']
@@ -540,10 +543,10 @@ class BayesianReasoner:
             '斥候': ScoutPolicy(),
             '书记官': ClerkPolicy(),
             '巡逻兵': PatrollerPolicy(),
-            '军医': DoctorPolicy(),
             '牧师': PriestPolicy(),
             '纹章官': HeraldPolicy(),
             '密探': SpyPolicy(),
+            # 军医已替换为掘墓人 (无 policy, 因为掘墓人不发信息事件 - 是变身能力)
         }
 
     def process_event(self, event: InfoEvent, alive_seats: List[int], current_claims: Dict[int, str]):
@@ -746,8 +749,7 @@ class BayesianReasoner:
         self.apply_interrogator_active_inference(events, alive_seats, all_players_state, deaths_log)
         self.apply_patroller_active_inference(events, alive_seats, all_players_state, deaths_log)
         self.apply_herald_active_inference(events, alive_seats, all_players_state, deaths_log)
-        if all_players_state:
-            self.apply_doctor_dead_evil_inference(events, alive_seats, all_players_state)
+        # 军医已替换为掘墓人, 不再有 apply_doctor_dead_evil_inference
         if register_count > 0:
             self.apply_clerk_subset_inference(events, alive_seats, register_count)
 
@@ -792,13 +794,17 @@ class Game:
         self.has_save_shield = False
         self.dead_man_seat = None
         self.dead_man_active = False
-        self.refugee_used = False
+        self.dead_man_role = None  # '死士' 或 '潜伏者'
+        self.gravedigger_used = False  # 掘墓人每局一次
+        # 注: 难民没"每局一次"限制 (移除 refugee_used flag)
         self.evil_dead_votes: Set[int] = set()
 
         self.archer_n1_target = None
         self.archer_swapped = False
         self.hex_target = None
         self.drunk_target = None
+        self.captive_bound = None  # 俘虏绑定 (a, b)
+        self.mole_target = None  # 内应 N1 选定目标
 
         self.events: List[InfoEvent] = []
         self.deaths: List[Tuple[str, int, str]] = []
@@ -828,7 +834,8 @@ class Game:
         if demon == '千面人':
             outsider_count, townsfolk_count = 2, 7  # 剧本只'爪牙变千面人', 不改外来者
             minions_assignment = ['千面人', '千面人']
-        elif demon == '先锋官' or '叛将' in minions_raw:
+        elif demon == '先锋官':
+            # 仅先锋官 +1 外来者; 潜伏者(替代叛将)不 +1
             outsider_count, townsfolk_count = 3, 6
             minions_assignment = minions_raw
         else:
@@ -859,13 +866,16 @@ class Game:
             else: team = '镇民'
 
             ps = PlayerState(seat=i, name=p, role=r, original_role=r, team=team)
+            # 死士 register 外来者; 潜伏者不 register (普通爪牙)
             ps.register_outsider = (r in outsiders) or (r == '死士') or ('千面人' in r)
             ps.register_minion = is_minion or (r == '死士') or ('千面人' in r)
             self.players[i] = ps
             if team == '邪恶': self.evil_seats.append(i)
-            if r == '死士':
+            # 复活栈: 死士 OR 潜伏者
+            if r in RESURRECTION_ROLES:
                 self.dead_man_seat = i
                 self.dead_man_active = True
+                self.dead_man_role = r  # 记录是死士还是潜伏者
             if r == '女伯爵': self.has_save_baron = True
             if r == '盾卫': self.has_save_shield = True
 
@@ -1144,9 +1154,10 @@ class Game:
             '书记官': self.gen_clerk_event,
             '斥候': self.gen_scout_event,
             '巡逻兵': self.gen_patroller_event,
-            '军医': self.gen_doctor_event,
             '牧师': self.gen_priest_event,
         }
+        # 掘墓人 N* (D2+): 选死信息源变身, 一次性
+        self._gravedigger_transform()
         # 真信息源
         for seat in self.alive_seats():
             p = self.players[seat]
@@ -1167,6 +1178,32 @@ class Game:
                     self.events.append(ev)
                     if self.verbose:
                         self.log(f'  {seat}({p.bluff_role},bluff): {ev.declared_result}', 1)
+
+    def _gravedigger_transform(self):
+        """掘墓人 N* 变身: 选最高价值死信息源, 复制角色 (一次性). 触发后掘墓人 role 改变,
+        original_role 不变 (牧师可检测此变化)."""
+        if self.day < 2 or self.gravedigger_used: return
+        gd_seats = [s for s in self.alive_seats() if self.players[s].role == '掘墓人']
+        if not gd_seats: return
+        # 找有价值的死镇民 (信息源优先)
+        dead_townsfolk = [s for s in self.players if not self.players[s].alive
+                          and self.players[s].original_role in TOWNSFOLK_POOL]
+        if not dead_townsfolk: return
+        # 选 INFO_SOURCES 优先, 次选保险栓/游侠
+        priority = [s for s in dead_townsfolk if self.players[s].original_role in INFO_SOURCES]
+        if not priority:
+            priority = [s for s in dead_townsfolk
+                        if self.players[s].original_role in {'盾卫', '女伯爵', '游侠', '军需官'}]
+        if not priority:
+            priority = dead_townsfolk
+        target = random.choice(priority)
+        gd_seat = gd_seats[0]
+        new_role = self.players[target].original_role  # 复制原角色 (即使死人现在是傀儡)
+        old = self.players[gd_seat].role
+        self.players[gd_seat].role = new_role
+        self.gravedigger_used = True
+        self.log(f'  ★ 掘墓人 N{self.day} 变身: {gd_seat} ({self.players[gd_seat].name}) '
+                 f'从 {old} → {new_role} (复制 {target})', 1)
 
     def day_info_gather(self):
         gen_map = {
@@ -1202,7 +1239,13 @@ class Game:
         self.log(f'  → {time} 死亡: {seat} ({self.players[seat].name}, {self.players[seat].role})', 1)
         if self.players[seat].role == '女伯爵': self.has_save_baron = False
         if self.players[seat].role == '盾卫': self.has_save_shield = False
-        # 死士复活栈
+
+        # 游侠夜死反杀 (剧本: 选活人, 若非恶魔邪恶则失能并死)
+        # 用 original_role 因为 role 可能已变 (但游侠通常不变身)
+        if method == '夜杀' and self.players[seat].original_role == '游侠' and self.players[seat].role == '游侠':
+            self._trigger_ranger(seat)
+
+        # 复活栈: 恶魔死 → 死士/潜伏者 变成那个恶魔
         if is_demon_role(self.players[seat].role) and self.dead_man_active:
             if self.dead_man_seat and self.players[self.dead_man_seat].alive:
                 old = self.players[self.dead_man_seat].role
@@ -1211,19 +1254,49 @@ class Game:
                 self.players[self.dead_man_seat].team = '邪恶'
                 self.demon_seats.append(self.dead_man_seat)
                 self.dead_man_active = False
-                self.log(f'  ★ 死士复活: {self.dead_man_seat} 从 {old} 变 {new}', 1)
-        # 触发死亡链 (修复 bug)
+                stack_role = self.dead_man_role or '死士'
+                self.log(f'  ★ {stack_role}复活: {self.dead_man_seat} 从 {old} 变 {new}', 1)
+
+        # 俘虏绑定生效: 处决其一 → 另一当晚死
+        if method == '处决' and self.captive_bound:
+            a, b = self.captive_bound
+            if seat == a or seat == b:
+                other = b if seat == a else a
+                if self.players[other].alive:
+                    self.captive_bound = None  # 触发后清空
+                    self.log(f'  ★ 俘虏绑定生效: {other} 当晚死', 1)
+                    self.kill(other, method='夜杀')
+
+        # 触发死亡链
         if self._should_trigger_death(seat, method):
             self._trigger_death_chain(seat)
         return True
+
+    def _trigger_ranger(self, ranger_seat):
+        """游侠夜死: 选一名活的非恶魔邪恶玩家, 他失能并死亡."""
+        # 选 reasoner 高 p_evil 的活人 (排除恶魔)
+        cands = [s for s in self.alive_seats() if not is_demon_role(self.players[s].role)]
+        if not cands: return
+        # 真游侠会基于直觉选, 模拟用 reasoner p_evil 排序
+        scores = [(s, self.world_state.p_evil(s)) for s in cands]
+        scores.sort(key=lambda x: -x[1])
+        target = scores[0][0]  # 选最可疑的
+        tp = self.players[target]
+        # 必须是非恶魔邪恶 (爪牙) 才生效
+        if tp.team == '邪恶' and not is_demon_role(tp.role):
+            tp.alive = False
+            self.deaths.append((f'N{self.day}', target, f'{tp.role}(游侠反杀)'))
+            self.log(f'  ★ 游侠 {ranger_seat} 反杀: {target} ({tp.role}) 失能并死亡', 1)
+        else:
+            self.log(f'  ★ 游侠 {ranger_seat} 选了 {target} ({tp.role}, {tp.team}) — 不是非恶魔邪恶, 无效', 1)
 
     def _should_trigger_death(self, seat, method):
         """新机制 (v6): 保险栓不再"阻止", 而是"吸收" — 触发时本人变傀儡 (silent),
         has_save_baron/has_save_shield 翻转. 一次有效."""
         p = self.players[seat]
-        # 死亡是否触发链由角色决定 (注册为外来者者: 外来者/傀儡/死士/千面人)
+        # 死亡是否触发链由角色决定 (注册为外来者者: 外来者/傀儡/死士/潜伏者/千面人)
         triggers_chain = (p.role in OUTSIDER_POOL or p.role == '傀儡'
-                          or '千面人' in p.role or p.role == '死士')
+                          or '千面人' in p.role or p.role == '死士' or p.role == '潜伏者')
         if not triggers_chain:
             return False
         # 保险栓吸收: 处决 → 女伯爵; 夜杀 → 盾卫
@@ -1256,11 +1329,20 @@ class Game:
         self.log(f'  ★ {old_role}吸收: {seat} ({p.name}) 变傀儡 (不告知)', 1)
 
     def _trigger_death_chain(self, seat):
-        """外来者死亡只触发自己能力. 死士/傀儡/千面人 才触发傀儡能力 (各自 ability 明说)."""
+        """外来者死亡触发自己能力 (除非先锋官在场, 则改触发傀儡能力).
+        死士/潜伏者/傀儡/千面人 触发傀儡能力."""
         role = self.players[seat].role
-        if role == '死士' or role == '傀儡' or '千面人' in role:
+        if role == '死士' or role == '潜伏者' or role == '傀儡' or '千面人' in role:
             self._trigger_puppet_death()
-        elif role == '难民':
+            return
+        # 先锋官在场: 外来者死亡改为触发傀儡死亡链 (邪恶任选外来者效果)
+        vanguard_alive = any(self.players[s].role == '先锋官' and self.players[s].alive
+                             for s in self.players)
+        if role in OUTSIDER_POOL and vanguard_alive:
+            self.log(f'  ★ 先锋官重定向: {role}死亡 → 傀儡死亡链', 1)
+            self._trigger_puppet_death()
+            return
+        if role == '难民':
             self._trigger_refugee()
         elif role == '伤兵':
             self._trigger_wounded()
@@ -1268,16 +1350,16 @@ class Game:
             self._trigger_deserter()
         elif role == '俘虏':
             self._trigger_captive()
-        # 先锋官 setup: 外来者"被视为傀儡"只是 register, 不触发 (剧本没明说触发)
 
     def _trigger_puppet_death(self):
         """傀儡死亡链 — 剧本: '不能与上次相同'"""
         valid = []
         last = getattr(self, 'last_puppet_chain', None)
-        if not self.refugee_used and any(not self.players[s].alive and self.players[s].team != '邪恶'
-                                          and s not in self.evil_dead_votes for s in self.players):
-            if last != '难民':
-                valid.append(('难民', 0.4))
+        # 难民效果可重复触发, 只要还有善良死人 (没"每局一次"限制)
+        has_good_dead = any(not self.players[s].alive and self.players[s].team != '邪恶'
+                            and s not in self.evil_dead_votes for s in self.players)
+        if has_good_dead and last != '难民':
+            valid.append(('难民', 0.4))
         if [s for s in self.alive_seats() if s not in self.evil_seats]:
             if last != '伤兵':
                 valid.append(('伤兵', 0.3))
@@ -1296,19 +1378,18 @@ class Game:
         elif chosen == '俘虏': self._trigger_captive()
 
     def _trigger_refugee(self):
-        if self.refugee_used: return
+        """难民效果: 选善良死人变邪恶 (无"每局一次"限制, 但已转化的不能重复)"""
         good_dead = [s for s in self.players if not self.players[s].alive
                       and self.players[s].team != '邪恶' and s not in self.evil_dead_votes]
         if not good_dead: return
         chosen = random.choice(good_dead)
         self.evil_dead_votes.add(chosen)
-        self.refugee_used = True
         self.log(f'  ★ 难民触发: {chosen} 变邪恶死人', 1)
 
     def _trigger_wounded(self):
         cands = [s for s in self.alive_seats() if s not in self.evil_seats]
         if not cands: return
-        weights = [0.30 if self.players[s].role in ['军医', '盾卫', '审讯官']
+        weights = [0.30 if self.players[s].role in ['掘墓人', '盾卫', '审讯官']
                    else 0.25 if self.players[s].role in ['女伯爵', '斥候']
                    else 0.05 for s in cands]
         chosen = random.choices(cands, weights=weights)[0]
@@ -1323,7 +1404,7 @@ class Game:
     def _trigger_deserter(self):
         cands = [s for s in self.alive_seats() if s not in self.evil_seats]
         if not cands: return
-        weights = [0.30 if self.players[s].role in ['军医', '审讯官', '斥候']
+        weights = [0.30 if self.players[s].role in ['掘墓人', '审讯官', '斥候']
                    else 0.05 if self.players[s].role == '游侠'
                    else 0.10 for s in cands]
         chosen = random.choices(cands, weights=weights)[0]
@@ -1331,17 +1412,21 @@ class Game:
         self.kill(chosen, method='夜杀')
 
     def _trigger_captive(self):
-        """俘虏 (新规则): 邪恶选活人 + 不在场善良角色, 强制疯狂. 简化处理: 50% 玩家 violate → 死."""
-        cands = [s for s in self.alive_seats() if s not in self.evil_seats]
-        if not cands: return
-        chosen = random.choice(cands)
-        # 简化 madness: 50% violate, storyteller 处决
-        if random.random() < 0.5:
-            self.log(f'  ★ 俘虏触发: {chosen} 疯狂违反 → storyteller 处决', 1)
-            self.kill(chosen, method='处决')
+        """俘虏死亡 (剧本): 邪恶选 2 名玩家绑定 — 处决其一另一当晚死."""
+        cands = self.alive_seats()
+        if len(cands) < 2: return
+        # 邪恶倾向绑定 2 名善良 (其中 1 名高威胁信息源)
+        good_cands = [s for s in cands if s not in self.evil_seats]
+        if len(good_cands) >= 2:
+            # 优先选信息源
+            weights = [0.30 if self.players[s].role in INFO_SOURCES else 0.10 for s in good_cands]
+            a = random.choices(good_cands, weights=weights)[0]
+            remaining = [s for s in good_cands if s != a]
+            b = random.choice(remaining)
         else:
-            self.log(f'  ★ 俘虏触发: {chosen} 疯狂保持假声称 (信息流混乱)', 1)
-            self.players[chosen].puppet = True  # 信息源失能
+            a, b = random.sample(cands, 2)
+        self.captive_bound = (a, b)
+        self.log(f'  ★ 俘虏触发: 绑定 {a} ↔ {b} (处决一人另一当晚死)', 1)
 
     def n_kill(self):
         if self.day < 2: return
@@ -1356,8 +1441,55 @@ class Game:
             r = self.players[s].role
             weights.append(0.30 if r in INFO_SOURCES else 0.05)
         target = random.choices(cands, weights=weights)[0]
+        target_role = self.players[target].role
+        target_is_outsider = (target_role in OUTSIDER_POOL or target_role == '傀儡')
         self.log(f'  恶魔杀: {target}')
         self.kill(target, method='夜杀')
+
+        # 征服者特殊: 杀外来者 → 选一名活人变邪恶
+        if self.demon_role == '征服者' and target_is_outsider:
+            self._trigger_conqueror_outsider_kill()
+
+        # 暗箭手特殊: 杀首夜目标 → 可与邪恶玩家交换角色
+        if self.demon_role == '暗箭手' and target == self.archer_n1_target and not self.archer_swapped:
+            self._trigger_archer_swap()
+
+    def _trigger_archer_swap(self):
+        """暗箭手杀 N1 目标后, 与邪恶玩家交换角色 (恶魔身份转移)"""
+        # 找邪恶非自己的玩家
+        archer_seats = [s for s in self.alive_seats()
+                        if self.players[s].role == '暗箭手']
+        if not archer_seats: return
+        archer = archer_seats[0]
+        cands = [s for s in self.alive_seats()
+                 if s != archer and s in self.evil_seats]
+        if not cands: return
+        target = random.choice(cands)
+        archer_role = self.players[archer].role
+        target_role = self.players[target].role
+        self.players[archer].role = target_role
+        self.players[target].role = archer_role
+        # 恶魔身份转移
+        if archer in self.demon_seats:
+            self.demon_seats.remove(archer)
+        self.demon_seats.append(target)
+        self.archer_swapped = True
+        self.log(f'  ★ 暗箭手交换: {archer} ({archer_role}) ↔ {target} ({target_role})', 1)
+
+    def _trigger_conqueror_outsider_kill(self):
+        """征服者杀外来者后: 选一名活的善良玩家变邪恶 (永久)"""
+        cands = [s for s in self.alive_seats() if self.players[s].team != '邪恶']
+        if not cands: return
+        # 偏好高价值信息源
+        weights = []
+        for s in cands:
+            r = self.players[s].role
+            weights.append(0.30 if r in INFO_SOURCES or r in ['盾卫', '女伯爵', '游侠'] else 0.10)
+        chosen = random.choices(cands, weights=weights)[0]
+        self.players[chosen].team = '邪恶'
+        if chosen not in self.evil_seats:
+            self.evil_seats.append(chosen)
+        self.log(f'  ★ 征服者外来者击杀触发: {chosen} ({self.players[chosen].name}) 变邪恶活人', 1)
 
     # ============= 处决 =============
     def day_execute(self):
@@ -1403,35 +1535,197 @@ class Game:
         alive = self.alive_seats()
         demons = self.alive_demons()
         if not demons: return '善良'
-        if len(alive) <= 2 and demons: return '邪恶'
+        evil_about_to_win = False
+        if len(alive) <= 2 and demons:
+            evil_about_to_win = True
         # 修复模拟器死锁: 善良全死(alive 全是邪恶) → 邪恶胜
-        # (真实游戏中这种局面下千面人会互相投出一个 → alive 降到 2,
-        # 但模拟器投票模型不够强, 会 D8-D15 干瞪眼超时)
         evil_alive = [s for s in alive if self.players[s].team == '邪恶']
-        if alive and len(evil_alive) == len(alive): return '邪恶'
+        if alive and len(evil_alive) == len(alive):
+            evil_about_to_win = True
+
+        if evil_about_to_win:
+            # 征服者末日反胜: 善良闭眼指 2 人, top 2 = 初始邪恶 → 善良反胜
+            if self.demon_role == '征服者':
+                return self._final_judgment()
+            return '邪恶'
         return None
+
+    def _final_judgment(self):
+        """征服者末日反胜建模:
+        善良玩家(初始善良, 包括已死) 各指 2 人, 取 top 2 by votes,
+        若 top 2 都是初始邪恶玩家集合的子集 → 善良反胜.
+        善良玩家的指认基于 reasoner 的 p_evil 排序 (高 p_evil 优先指).
+        """
+        # 初始邪恶
+        initial_evil = set()
+        for s, p in self.players.items():
+            if is_demon_role(p.original_role) or p.original_role in MINION_POOL:
+                initial_evil.add(s)
+        # 初始善良玩家 (包括已死/已变邪恶: 用 original_role 判定)
+        initial_good = [s for s, p in self.players.items()
+                        if not is_demon_role(p.original_role)
+                        and p.original_role not in MINION_POOL]
+        # 排除"已变邪恶活人" (征服者/难民转化的) - 他们闭眼时是邪恶, 放手不指认
+        good_voters = [s for s in initial_good if self.players[s].team != '邪恶']
+        if not good_voters:
+            self.log(f'  ★ 征服者末日: 无善良指认者 → 邪恶胜', 1)
+            return '邪恶'
+
+        # 每个善良用 reasoner 排序, 选 p_evil 最高的 2 人
+        votes = {}
+        for voter in good_voters:
+            scores = [(s, self.world_state.p_evil(s)) for s in self.players if s != voter]
+            scores.sort(key=lambda x: -x[1])
+            picks = [s for s, _ in scores[:2]]
+            for pick in picks:
+                votes[pick] = votes.get(pick, 0) + 1
+
+        # Top 2
+        sorted_votes = sorted(votes.items(), key=lambda x: -x[1])
+        top2 = set(s for s, _ in sorted_votes[:2])
+
+        if top2 and top2.issubset(initial_evil):
+            self.log(f'  ★ 征服者末日反胜: top2={top2} 都是初始邪恶 → 善良胜', 1)
+            return '善良'
+        self.log(f'  ★ 征服者末日: top2={top2} 不全是初始邪恶 → 邪恶胜', 1)
+        return '邪恶'
 
     def play(self):
         self.print_config()
         self.log('=== N1 ===')
         self.day = 1
+        # N1 邪恶角色行动 (暗箭手傀儡, 内应选目标, 蛊惑者蛊惑)
+        self._n1_evil_actions()
         self.night_info_gather()
 
         max_days = 15
         while self.day <= max_days:
             self.log(f'\n=== D{self.day} ===')
+            # 黎明: 内应双变傀儡 (D2 起)
+            self._dawn_actions()
             self.day_info_gather()
+            # 白天主动: 军需官醉一人
+            self._day_active_actions()
             self.day_execute()
             w = self.check_win()
             if w: return w, self.day
             self.day += 1
             if self.day > max_days: break
             self.log(f'\n=== N{self.day} ===')
+            # 重置 hex 状态 (上一晚的 hex 过期)
+            self._reset_nightly_hex()
+            # N* 邪恶/善良行动: 蛊惑者每晚, 暗箭手每晚*杀
+            self._other_night_evil_actions()
             self.n_kill()
             self.night_info_gather()
             w = self.check_win()
             if w: return w, self.day
         return '平局/超时', self.day - 1
+
+    # ============= 角色主动能力 (N1 / N* / D / D*) =============
+    def _n1_evil_actions(self):
+        """N1 邪恶 setup-driven 行动: 蛊惑者邻座, 内应选目标, 暗箭手傀儡"""
+        # 蛊惑者 N1
+        self._hex_action()
+        # 内应 N1: 选活人, 明日双变傀儡
+        mole_seats = [s for s in self.alive_seats() if self.players[s].role == '内应']
+        if mole_seats:
+            mole = mole_seats[0]
+            cands = [s for s in self.alive_seats() if s != mole]
+            if cands:
+                # 优先选信息源
+                weights = [0.30 if self.players[s].role in INFO_SOURCES
+                           else 0.20 if self.players[s].role in {'盾卫', '女伯爵'}
+                           else 0.05 for s in cands]
+                target = random.choices(cands, weights=weights)[0]
+                self.mole_target = target
+                self.log(f'  ★ 内应 N1: {mole} 选 {target} (D2 黎明双变傀儡)', 1)
+        # 暗箭手 N1: 选玩家变傀儡
+        if self.demon_role == '暗箭手':
+            archer_seats = [s for s in self.alive_seats()
+                            if self.players[s].role == '暗箭手']
+            if archer_seats:
+                archer = archer_seats[0]
+                cands = [s for s in self.alive_seats() if s not in self.evil_seats]
+                if cands:
+                    weights = [0.30 if self.players[s].role in INFO_SOURCES
+                               else 0.25 if self.players[s].role in {'盾卫', '女伯爵', '游侠'}
+                               else 0.05 for s in cands]
+                    target = random.choices(cands, weights=weights)[0]
+                    p = self.players[target]
+                    p.role = '傀儡'
+                    p.puppet = True
+                    p.register_outsider = True
+                    self.archer_n1_target = target
+                    self.log(f'  ★ 暗箭手 N1: 选 {target} ({p.name}) 变傀儡', 1)
+
+    def _dawn_actions(self):
+        """D2+ 黎明: 内应双变傀儡 (内应 N1 选了目标的话)"""
+        if self.day < 2 or not self.mole_target: return
+        target = self.mole_target
+        # 内应自己 + target 都变傀儡
+        for s, p in self.players.items():
+            if p.original_role == '内应' and p.alive and p.role == '内应':
+                p.role = '傀儡'
+                p.puppet = True
+                self.log(f'  ★ 内应黎明: {s} ({p.name}) 变傀儡', 1)
+                break
+        if self.players[target].alive and self.players[target].role != '傀儡':
+            tp = self.players[target]
+            tp.role = '傀儡'
+            tp.puppet = True
+            tp.register_outsider = True
+            self.log(f'  ★ 内应黎明: {target} ({tp.name}) 也变傀儡', 1)
+        self.mole_target = None  # 一次性
+
+    def _other_night_evil_actions(self):
+        """N2+ 邪恶夜活: 蛊惑者每晚选邻座"""
+        self._hex_action()
+
+    def _hex_action(self):
+        """蛊惑者每晚 (含 N1): 选邻座变傀儡 (当晚+明天白天)"""
+        hexer_seats = [s for s in self.alive_seats() if self.players[s].role == '蛊惑者']
+        if not hexer_seats: return
+        hexer = hexer_seats[0]
+        l, r = self.neighbors(hexer)
+        cands = [n for n in [l, r] if n is not None and self.players[n].alive]
+        if not cands: return
+        # 优先邻座信息源
+        weights = [0.40 if self.players[s].role in INFO_SOURCES else 0.20 for s in cands]
+        target = random.choices(cands, weights=weights)[0]
+        self.hex_target = target
+        self.players[target].is_hexed = True
+        self.log(f'  ★ 蛊惑者 N{self.day}: {hexer} 蛊惑邻座 {target} ({self.players[target].name})', 1)
+
+    def _reset_nightly_hex(self):
+        """每晚开始重置上一轮 hex 状态 (蛊惑只持续当晚+次日白天)"""
+        for p in self.players.values():
+            p.is_hexed = False
+        self.hex_target = None
+
+    def _day_active_actions(self):
+        """白天主动: 军需官每天选一人, 若爪牙/外来者则醉酒到下个黎明"""
+        qm_seats = [s for s in self.alive_seats() if self.players[s].role == '军需官']
+        if not qm_seats: return
+        qm = qm_seats[0]
+        # 用 reasoner p_evil 选最可疑
+        cands = [s for s in self.alive_seats() if s != qm]
+        if not cands: return
+        scores = [(s, self.world_state.p_evil(s)) for s in cands]
+        scores.sort(key=lambda x: -x[1])
+        target = scores[0][0]
+        tp = self.players[target]
+        # 如果是爪牙或外来者则醉酒
+        is_minion_or_outsider = (tp.team == '邪恶' and not is_demon_role(tp.role)) or \
+                                tp.team == '外来者' or \
+                                tp.register_outsider or \
+                                tp.register_minion
+        if is_minion_or_outsider:
+            tp.is_drunk = True
+            self.drunk_target = target
+            self.log(f'  ★ 军需官 D{self.day}: {qm} 选 {target} ({tp.role}) → 醉酒', 1)
+        else:
+            self.log(f'  ★ 军需官 D{self.day}: {qm} 选 {target} → 不爪牙/外来 (无效)', 1)
 
     def print_config(self):
         if not self.verbose: return

@@ -21,7 +21,7 @@ The Shieldbearer absorbs an Outsider's night-death chain — they become a Puppe
 🎭 **Four Distinct Demons**
 - **Conqueror** — Kills Outsiders to convert the living. Final accusation showdown.
 - **Shadow Archer** — Creates a Puppet on the first night. Can swap characters to hide identity.
-- **Vanguard** — Outsiders also register as Puppet. Chain explosion potential.
+- **Vanguard** — Outsider deaths trigger Puppet death chain instead. Flexible chain explosions.
 - **Shapeshifter** — All Minions become Shapeshifters. Multiple Demons coordinate kills.
 
 🕵️ **Rich Information Roles**
@@ -74,7 +74,7 @@ Inquisitor (detect evil), Herald/Patrolman (detect Outsiders), Gravedigger (inhe
 |-----------|---------|
 | Conqueror | Each night*, choose a player: they die. If you killed an Outsider, choose an alive player: they turn evil. When evil would win, all players close their eyes & each point at 2 players; evil players lower their hands — if the top 2 among good players' choices are the starting evil players, good wins instead. |
 | Shadow Archer | On your first night, choose a player: they become a Puppet. Each night*, choose a player: they die. If you kill the player you chose on your first night, you may swap characters with an evil player. |
-| Vanguard | Each night*, choose a player: they die. Outsiders also register as a Puppet. [+1 Outsider] |
+| Vanguard | Each night*, choose a player: they die. When an Outsider dies, a Puppet's death effect is triggered instead. [+1 Outsider] |
 | Shapeshifter | Each night*, the Shapeshifters must jointly choose a player: they die. When you die, trigger a Puppet's death ability. You also register as an Outsider & a Minion. [During setup, Minions become Shapeshifters] |
 
 ---
